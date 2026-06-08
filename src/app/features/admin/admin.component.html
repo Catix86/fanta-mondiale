@@ -8,6 +8,18 @@
     <section class="card error-card"><p>{{ errorMessage() }}</p></section>
   }
 
+  <!-- <section class="card">
+    <h2>Import calendario gironi 2026</h2>
+    <p class="muted">
+      Crea/aggiorna automaticamente le 72 partite della fase a gironi del Mondiale 2026.
+      Gli ID sono deterministici, quindi se lo lanci due volte non crea duplicati.
+    </p>
+
+    <button class="btn warn" type="button" [disabled]="creatingMatch()" (click)="importGroupStage2026()">
+      @if(creatingMatch()) { Import in corso... } @else { Importa 72 partite gironi }
+    </button>
+  </section> -->
+
   <section class="card">
     <h2>Nuova partita</h2>
     <p class="muted">Crea un match del calendario. Sarà subito visibile agli utenti.</p>
@@ -76,7 +88,7 @@
       <section class="card match-admin-card">
         <div class="match-admin-topline">
           <strong>{{ match.homeTeam }} - {{ match.awayTeam }}</strong>
-          <span>{{ match.status }}</span>
+          <span>{{ statusLabel(match.status) }}</span>
         </div>
 
         <p class="muted match-date">{{ matchDate(match) | date:'dd MMM HH:mm' }}</p>

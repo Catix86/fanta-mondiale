@@ -54,6 +54,15 @@ export class AdminComponent {
     return new Date(kickoffAt);
   }
 
+  statusLabel(status: string): string {
+    switch (status) {
+      case 'scheduled': return 'Programmato';
+      case 'live': return 'In corso';
+      case 'finished': return 'Terminato';
+      default: return status;
+    }
+  }
+
   async createMatch(): Promise<void> {
     this.successMessage.set('');
     this.errorMessage.set('');
@@ -131,6 +140,22 @@ export class AdminComponent {
       this.errorMessage.set('Risultato non salvato. Verifica di avere ruolo admin e rules corrette.');
     } finally {
       this.savingMatchId.set(null);
+    }
+  }
+
+  async importGroupStage2026(): Promise<void> {
+    this.successMessage.set('');
+    this.errorMessage.set('');
+    this.creatingMatch.set(true);
+
+    try {
+      const count = await this.matches.importWorldCup2026GroupStageMatches();
+      this.successMessage.set(`Import completato: ${count} partite della fase a gironi create/aggiornate.`);
+    } catch (error) {
+      console.error('Errore import calendario:', error);
+      this.errorMessage.set('Import non riuscito. Verifica ruolo admin e Firestore Rules.');
+    } finally {
+      this.creatingMatch.set(false);
     }
   }
 }

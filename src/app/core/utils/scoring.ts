@@ -1,7 +1,7 @@
 export const SCORING_RULES = {
   EXACT_RESULT: 10,
-  CORRECT_OUTCOME: 3,
-  CHAMPION_WINNER: 150
+  CORRECT_OUTCOME: 4,
+  CHAMPION_WINNER: 100
 } as const;
 
 export function outcome(home: number, away: number): '1' | 'X' | '2' {

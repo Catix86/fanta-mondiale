@@ -8,10 +8,12 @@ import {
   doc,
   orderBy,
   query,
-  updateDoc
+  updateDoc,
+  writeBatch
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Match, MatchStage, MatchStatus } from '../models/match.model';
+import { WORLD_CUP_2026_GROUP_STAGE_MATCHES } from '../data/world-cup-2026-group-stage.seed';
 
 export interface CreateMatchPayload {
   homeTeam: string;
@@ -41,6 +43,30 @@ export class MatchService {
       status: 'scheduled' as MatchStatus
     };
     await addDoc(ref, matchToCreate);
+  }
+
+  /**
+   * Import idempotente dei 72 match della fase a gironi WC 2026.
+   * Usa ID deterministici wc2026-gs-001..072, quindi se lo lanci due volte NON crea duplicati:
+   * aggiorna gli stessi documenti.
+   */
+  async importWorldCup2026GroupStageMatches(): Promise<number> {
+    const batch = writeBatch(this.firestore);
+
+    for (const match of WORLD_CUP_2026_GROUP_STAGE_MATCHES) {
+      const matchRef = doc(this.firestore, `matches/${match.id}`);
+      batch.set(matchRef, {
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        group: match.group,
+        stage: match.stage,
+        kickoffAt: Timestamp.fromDate(new Date(match.kickoffAtIso)),
+        status: match.status
+      });
+    }
+
+    await batch.commit();
+    return WORLD_CUP_2026_GROUP_STAGE_MATCHES.length;
   }
 
   setOfficialResult(matchId: string, home: number, away: number): Promise<void> {

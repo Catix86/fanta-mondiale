@@ -79,7 +79,7 @@ a {
   border-radius: 18px;
   padding: 14px 16px;
   font-weight: 900;
-  background: var(--primary);
+  background: var(--accent);
   color: #020617;
   text-align: center;
 }
@@ -135,6 +135,6 @@ a {
 }
 
 .nav-btn.active {
-  background: var(--primary);
+  background: var(--accent);
   color: #020617;
 }
