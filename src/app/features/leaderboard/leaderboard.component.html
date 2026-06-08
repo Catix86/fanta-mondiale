@@ -1,0 +1,23 @@
+<main class="leaderboard-content">
+  <h1>Classifica</h1>
+
+  @if(leaderboard$ | async; as leaderboard) {
+    @if(leaderboard.length === 0) {
+      <section class="card"><p class="muted">Nessun utente in classifica.</p></section>
+    }
+
+    @for(user of leaderboard; track user.uid; let i = $index) {
+      <section class="card leaderboard-row" [class.first]="i === 0">
+        <div class="rank">{{ i + 1 }}</div>
+        <div class="user-info">
+          <strong>{{ user.username }}</strong>
+          <p>
+            {{ user.exactResults }} esatti · {{ user.correctOutcomes }} esiti · Vincente: {{ user.championPick }}
+            @if(user.championBonus) { · Bonus campione }
+          </p>
+        </div>
+        <strong class="points">{{ user.points }}</strong>
+      </section>
+    }
+  }
+</main>

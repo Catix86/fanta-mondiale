@@ -1,0 +1,138 @@
+.calendar-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(2, 6, 23, .9);
+    backdrop-filter: blur(14px);
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.hello {
+    margin: 0;
+    color: var(--primary);
+    font-weight: 900;
+    font-size: 12px;
+}
+
+h1 {
+    margin: 2px 0 8px;
+    font-size: 28px;
+    font-weight: 1000;
+}
+
+.summary-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+}
+
+.summary-card strong {
+    display: block;
+    font-size: 20px;
+}
+
+.calendar-content {
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.success-card {
+    background: rgba(52, 211, 153, .16);
+    border-color: rgba(52, 211, 153, .35);
+}
+
+.success-card p {
+    margin: 0;
+    color: #86efac;
+    font-weight: 900;
+}
+
+.error-card {
+    background: rgba(252, 211, 77, .12);
+    border-color: rgba(252, 211, 77, .35);
+}
+
+.error-card p {
+    margin: 0;
+    color: var(--accent);
+    font-weight: 900;
+}
+
+.match-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.match-topline strong {
+    color: #67e8f9;
+}
+
+.match-topline span {
+    font-size: 12px;
+}
+
+.teams-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
+    text-align: center;
+    align-items: center;
+    margin: 14px 0;
+}
+
+.official-result {
+    background: #020617;
+    border-radius: 16px;
+    padding: 12px;
+    margin: 12px 0;
+    text-align: center;
+}
+
+.score-inputs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.score-input {
+    width: 72px;
+    text-align: center;
+    font-weight: 900;
+    font-size: 22px;
+}
+
+.locked-message {
+    text-align: center;
+    color: var(--accent);
+    font-weight: 900;
+    margin: 12px 0 0;
+}
+
+.calendar-user-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.logout-button {
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, .08);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.logout-button:active {
+    transform: scale(.98);
+}

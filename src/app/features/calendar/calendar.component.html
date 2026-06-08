@@ -1,0 +1,86 @@
+<header class="calendar-header">
+    @if(user$ | async; as user) {
+    <div class="calendar-user-row">
+        <div>
+            <p class="hello">Ciao, {{ user.username }}</p>
+            <h1>Fanta Mondiale</h1>
+        </div>
+
+        <button type="button" class="logout-button" (click)="logout()" aria-label="Esci">
+            Logout
+        </button>
+    </div>
+
+
+    <div class="card summary-card">
+        <div>
+            <span class="muted">Punti</span>
+            <strong>{{ user.points || 0 }}</strong>
+        </div>
+        <div>
+            <span class="muted">Vincente</span>
+            <strong>{{ user.championPick }}</strong>
+        </div>
+    </div>
+    }
+</header>
+
+<main class="calendar-content">
+    @if(successMessage()) {
+    <section class="card success-card">
+        <p>{{ successMessage() }}</p>
+    </section>
+    }
+    @if(errorMessage()) {
+    <section class="card error-card">
+        <p>{{ errorMessage() }}</p>
+    </section>
+    }
+
+    @if(matches$ | async; as matches) {
+    @if(matches.length === 0) {
+    <section class="card">
+        <h2>Calendario vuoto</h2>
+        <p class="muted">Non ci sono ancora partite importate. Accedi come admin e crea almeno un match.</p>
+    </section>
+    }
+
+    @for(match of matches; track match.id) {
+    <section class="card match-card">
+        <div class="match-topline">
+            <strong>{{ match.group ? 'Gruppo ' + match.group : match.stage }}</strong>
+            <span class="muted">{{ matchDate(match) | date:'dd MMM HH:mm' }}</span>
+        </div>
+
+        <div class="teams-row">
+            <strong>{{ match.homeTeam }}</strong>
+            <span class="muted">vs</span>
+            <strong>{{ match.awayTeam }}</strong>
+        </div>
+
+        @if(match.status === 'finished') {
+        <p class="official-result">Risultato ufficiale:
+            <strong>{{ match.officialHomeGoals }}-{{ match.officialAwayGoals }}</strong></p>
+        }
+
+        @if(!locked(match)) {
+        <div class="score-inputs">
+            <input class="input score-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).home">
+            <strong>-</strong>
+            <input class="input score-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).away">
+        </div>
+
+        <button class="btn" [disabled]="savingMatchId() === match.id" (click)="save(match)">
+            @if(savingMatchId() === match.id) { Salvataggio... } @else { Salva pronostico }
+        </button>
+        } @else {
+        <p class="locked-message">Pronostico bloccato</p>
+        }
+    </section>
+    }
+    } @else {
+    <section class="card">
+        <p class="muted">Caricamento calendario...</p>
+    </section>
+    }
+</main>

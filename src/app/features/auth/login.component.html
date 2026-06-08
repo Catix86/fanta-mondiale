@@ -1,0 +1,18 @@
+<main class="auth-page mobile-page">
+  <section class="card auth-card">
+    <h1>Fanta Mondiale</h1>
+    <p class="muted">Accedi e fai i tuoi pronostici.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+      <input class="input" placeholder="Username" formControlName="username">
+      <input class="input" placeholder="Password" type="password" formControlName="password">
+
+      @if(error()) {
+        <p class="error-message">{{ error() }}</p>
+      }
+
+      <button class="btn" [disabled]="form.invalid || loading()">Entra</button>
+      <a routerLink="/register" class="btn secondary">Registrati</a>
+    </form>
+  </section>
+</main>

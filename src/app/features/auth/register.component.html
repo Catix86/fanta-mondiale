@@ -1,0 +1,26 @@
+<main class="auth-page mobile-page">
+  <section class="card auth-card">
+    <h1>Registrati</h1>
+    <p class="muted">La vincente scelta ora non potrà essere cambiata.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+      <input class="input" placeholder="Username" formControlName="username">
+      <input class="input" placeholder="Password" type="password" formControlName="password">
+      <input class="input" placeholder="Conferma password" type="password" formControlName="confirmPassword">
+
+      <select class="input" formControlName="championPick">
+        <option value="">Scegli vincente Mondiale</option>
+        @for(team of teams; track team) {
+          <option [value]="team">{{ team }}</option>
+        }
+      </select>
+
+      @if(error()) {
+        <p class="error-message">{{ error() }}</p>
+      }
+
+      <button class="btn warn" [disabled]="form.invalid || loading()">Registrati e blocca scelta</button>
+      <a routerLink="/login" class="btn secondary">Ho già un account</a>
+    </form>
+  </section>
+</main>

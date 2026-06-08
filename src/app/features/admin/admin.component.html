@@ -1,0 +1,101 @@
+<main class="admin-content">
+  <h1>Admin</h1>
+
+  @if(successMessage()) {
+    <section class="card success-card"><p>{{ successMessage() }}</p></section>
+  }
+  @if(errorMessage()) {
+    <section class="card error-card"><p>{{ errorMessage() }}</p></section>
+  }
+
+  <section class="card">
+    <h2>Nuova partita</h2>
+    <p class="muted">Crea un match del calendario. Sarà subito visibile agli utenti.</p>
+
+    <form [formGroup]="createMatchForm" (ngSubmit)="createMatch()" class="match-form">
+      <div>
+        <label class="muted">Squadra casa</label>
+        <select class="input" formControlName="homeTeam">
+          <option value="">Seleziona squadra casa</option>
+          @for(team of teams; track team) {
+            <option [value]="team">{{ team }}</option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <label class="muted">Squadra trasferta</label>
+        <select class="input" formControlName="awayTeam">
+          <option value="">Seleziona squadra trasferta</option>
+          @for(team of teams; track team) {
+            <option [value]="team">{{ team }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label class="muted">Gruppo</label>
+          <input class="input" formControlName="group" placeholder="Es. A">
+        </div>
+        <div>
+          <label class="muted">Fase</label>
+          <select class="input" formControlName="stage">
+            @for(stage of stages; track stage.value) {
+              <option [value]="stage.value">{{ stage.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="muted">Data e ora</label>
+        <input class="input" type="datetime-local" formControlName="kickoffAt">
+      </div>
+
+      <button class="btn warn" type="submit" [disabled]="creatingMatch()">
+        @if(creatingMatch()) { Creazione... } @else { Crea partita }
+      </button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Gestione risultati</h2>
+    <p class="muted">Inserisci il risultato ufficiale. Quando salvi, la partita passa allo stato <strong>finished</strong>.</p>
+  </section>
+
+  @if(matches$ | async; as matches) {
+    @if(matches.length === 0) {
+      <section class="card">
+        <h2>Nessuna partita</h2>
+        <p class="muted">Usa il form sopra per creare la prima partita.</p>
+      </section>
+    }
+
+    @for(match of matches; track match.id) {
+      <section class="card match-admin-card">
+        <div class="match-admin-topline">
+          <strong>{{ match.homeTeam }} - {{ match.awayTeam }}</strong>
+          <span>{{ match.status }}</span>
+        </div>
+
+        <p class="muted match-date">{{ matchDate(match) | date:'dd MMM HH:mm' }}</p>
+
+        @if(match.status === 'finished') {
+          <p class="official-result">Risultato attuale: <strong>{{ match.officialHomeGoals }}-{{ match.officialAwayGoals }}</strong></p>
+        }
+
+        <div class="result-row">
+          <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).home">
+          <strong>-</strong>
+          <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).away">
+          <button class="btn save-result-btn" [disabled]="savingMatchId() === match.id" (click)="saveResult(match)">
+            @if(savingMatchId() === match.id) { Salvo... } @else { Salva }
+          </button>
+        </div>
+      </section>
+    }
+  } @else {
+    <section class="card"><p class="muted">Caricamento partite...</p></section>
+  }
+</main>

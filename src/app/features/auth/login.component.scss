@@ -1,0 +1,33 @@
+.auth-page {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.auth-card {
+    width: 100%;
+}
+
+h1 {
+    font-size: 32px;
+    margin: 0 0 4px;
+    font-weight: 1000;
+}
+
+p {
+    margin: 0 0 24px;
+}
+
+.auth-form {
+    display: grid;
+    gap: 12px;
+}
+
+.error-message {
+    color: var(--accent);
+    margin: 0;
+}
+
+a.btn {
+    text-decoration: none;
+}

@@ -1,0 +1,15 @@
+<div class="mobile-page">
+  <router-outlet />
+
+  @if(user$ | async; as user) {
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner" [class.cols-3]="user.role === 'admin'" [class.cols-2]="user.role !== 'admin'">
+        <a routerLink="/calendario" routerLinkActive="active" class="nav-btn">Calendario</a>
+        <a routerLink="/classifica" routerLinkActive="active" class="nav-btn">Classifica</a>
+        @if(user.role === 'admin') {
+          <a routerLink="/admin" routerLinkActive="active" class="nav-btn">Admin</a>
+        }
+      </div>
+    </nav>
+  }
+</div>

@@ -1,0 +1,97 @@
+.admin-content {
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+h1 {
+    font-size: 30px;
+    margin: 8px 0;
+    font-weight: 1000;
+}
+
+h2 {
+    margin: 0 0 8px;
+}
+
+.card>p {
+    margin: 0;
+}
+
+.success-card {
+    background: rgba(52, 211, 153, .16);
+    border-color: rgba(52, 211, 153, .35);
+}
+
+.success-card p {
+    color: #86efac;
+    font-weight: 900;
+}
+
+.error-card {
+    background: rgba(252, 211, 77, .12);
+    border-color: rgba(252, 211, 77, .35);
+}
+
+.error-card p {
+    color: var(--accent);
+    font-weight: 900;
+}
+
+.match-form {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.match-admin-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.match-admin-topline span {
+    font-size: 12px;
+    color: #67e8f9;
+    font-weight: 900;
+}
+
+.match-date {
+    margin: 4px 0 12px;
+}
+
+.official-result {
+    background: #020617;
+    border-radius: 16px;
+    padding: 12px;
+    margin: 0 0 12px;
+}
+
+.result-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.result-input {
+    width: 72px;
+    text-align: center;
+}
+
+.save-result-btn {
+    width: auto;
+    min-width: 96px;
+}
