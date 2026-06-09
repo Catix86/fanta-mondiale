@@ -74,6 +74,30 @@
         } @else {
         <p class="locked-message">Pronostico bloccato</p>
         }
+        @if(matchPredictions(match.id).length > 0) {
+        <div class="other-predictions">
+            <div class="other-predictions-header">
+                <strong>Pronostici dei giocatori</strong>
+                <span>{{ matchPredictions(match.id).length }}</span>
+            </div>
+
+            @if(matchPredictions(match.id).length === 0) {
+            <p class="muted empty-predictions">
+                Nessun pronostico inserito.
+            </p>
+            }
+
+            @for(prediction of matchPredictions(match.id); track prediction.uid) {
+            <div class="prediction-row">
+                <span>{{ prediction.username }}</span>
+
+                <strong>
+                    {{ prediction.predictedHomeGoals }}-{{ prediction.predictedAwayGoals }}
+                </strong>
+            </div>
+            }
+        </div>
+        }
     </section>
     }
     } @else {

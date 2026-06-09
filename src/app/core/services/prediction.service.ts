@@ -31,6 +31,12 @@ export class PredictionService {
     return collectionData(q, { idField: 'id' }) as Observable<Prediction[]>;
   }
 
+  getAllPredictions(): Observable<Prediction[]> {
+    const ref = collection(this.firestore, 'predictions');
+
+    return collectionData(ref, { idField: 'id' }) as Observable<Prediction[]>;
+  }
+
   async savePrediction(
     match: Match,
     homeGoals: number,

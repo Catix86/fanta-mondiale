@@ -9,7 +9,26 @@ import { isPredictionLocked } from '../../core/utils/scoring';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap, of } from 'rxjs';
+import {
+  Firestore,
+  collection,
+  collectionData
+} from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { Prediction } from '../../core/models/prediction.model';
 
+
+interface CalendarUser {
+  uid: string;
+  username: string;
+}
+
+interface MatchPredictionView {
+  uid: string;
+  username: string;
+  predictedHomeGoals: number;
+  predictedAwayGoals: number;
+}
 
 @Component({
   standalone: true,
@@ -23,6 +42,7 @@ export class CalendarComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private firestore = inject(Firestore);
 
   matches$ = this.matches.getMatches();
   user$ = this.auth.appUser$;
@@ -30,6 +50,9 @@ export class CalendarComponent {
   savingMatchId = signal<string | null>(null);
   successMessage = signal('');
   errorMessage = signal('');
+
+  allPredictions: Prediction[] = [];
+  usersMap: Record<string, string> = {};
 
   drafts: Record<string, { home: number; away: number }> = {};
 
@@ -53,6 +76,24 @@ export class CalendarComponent {
           };
         }
       });
+
+    collectionData(collection(this.firestore, 'users'), { idField: 'uid' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(users => {
+        const map: Record<string, string> = {};
+
+        for (const user of users as CalendarUser[]) {
+          map[user.uid] = user.username;
+        }
+
+        this.usersMap = map;
+      });
+
+    this.predictions.getAllPredictions()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(predictions => {
+        this.allPredictions = predictions;
+      });
   }
 
   draft(matchId: string): { home: number; away: number } {
@@ -72,6 +113,18 @@ export class CalendarComponent {
 
   locked(match: Match): boolean {
     return isPredictionLocked(this.matchDate(match)) || match.status !== 'scheduled';
+  }
+
+  matchPredictions(matchId: string): MatchPredictionView[] {
+    return this.allPredictions
+      .filter(prediction => prediction.matchId === matchId)
+      .map(prediction => ({
+        uid: prediction.uid,
+        username: this.usersMap[prediction.uid] || 'Utente',
+        predictedHomeGoals: prediction.predictedHomeGoals,
+        predictedAwayGoals: prediction.predictedAwayGoals
+      }))
+      .sort((a, b) => a.username.localeCompare(b.username));
   }
 
   async save(match: Match): Promise<void> {
@@ -109,7 +162,6 @@ export class CalendarComponent {
       this.savingMatchId.set(null);
     }
   }
-
 
   async logout(): Promise<void> {
     try {

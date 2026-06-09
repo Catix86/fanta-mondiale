@@ -141,3 +141,60 @@ h1 {
 .logout-button:active {
     transform: scale(.98);
 }
+
+.other-predictions {
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 18px;
+    background: rgba(2, 6, 23, .72);
+    border: 1px solid rgba(255, 255, 255, .08);
+}
+
+.other-predictions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.other-predictions-header strong {
+    font-size: 13px;
+}
+
+.other-predictions-header span {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(52, 211, 153, .16);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.empty-predictions {
+    margin: 0;
+    font-size: 12px;
+}
+
+.prediction-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.prediction-row span {
+    font-size: 13px;
+}
+
+.prediction-row strong {
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .10);
+    font-size: 13px;
+}
