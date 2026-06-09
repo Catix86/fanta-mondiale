@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatchService } from '../../core/services/match.service';
@@ -7,6 +7,9 @@ import { AuthService } from '../../core/services/auth.service';
 import { Match } from '../../core/models/match.model';
 import { isPredictionLocked } from '../../core/utils/scoring';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, of } from 'rxjs';
+
 
 @Component({
   standalone: true,
@@ -19,6 +22,7 @@ export class CalendarComponent {
   private predictions = inject(PredictionService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   matches$ = this.matches.getMatches();
   user$ = this.auth.appUser$;
@@ -29,6 +33,28 @@ export class CalendarComponent {
 
   drafts: Record<string, { home: number; away: number }> = {};
 
+  constructor() {
+    this.auth.firebaseUser$
+      .pipe(
+        switchMap(user => {
+          if (!user) {
+            return of([]);
+          }
+
+          return this.predictions.getUserPredictions(user.uid);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(predictions => {
+        for (const prediction of predictions) {
+          this.drafts[prediction.matchId] = {
+            home: prediction.predictedHomeGoals,
+            away: prediction.predictedAwayGoals
+          };
+        }
+      });
+  }
+
   draft(matchId: string): { home: number; away: number } {
     if (!this.drafts[matchId]) this.drafts[matchId] = { home: 0, away: 0 };
     return this.drafts[matchId];
@@ -36,7 +62,11 @@ export class CalendarComponent {
 
   matchDate(match: Match): Date {
     const kickoffAt: any = match.kickoffAt;
-    if (kickoffAt?.toDate) return kickoffAt.toDate();
+
+    if (kickoffAt?.toDate) {
+      return kickoffAt.toDate();
+    }
+
     return new Date(kickoffAt);
   }
 

@@ -3,6 +3,7 @@ import { AsyncPipe } from '@angular/common';
 import { Firestore, collection, collectionData, doc, docData } from '@angular/fire/firestore';
 import { combineLatest, map, Observable, of, catchError } from 'rxjs';
 import { SCORING_RULES, outcome } from '../../core/utils/scoring';
+import { AuthService } from '../../core/services/auth.service';
 
 interface AppUserRow {
   uid: string;
@@ -46,6 +47,9 @@ interface LeaderboardRow {
 })
 export class LeaderboardComponent {
   private firestore = inject(Firestore);
+  private auth = inject(AuthService);
+  
+  user$ = this.auth.appUser$;
 
   private users$ = collectionData(collection(this.firestore, 'users')) as Observable<AppUserRow[]>;
   private matches$ = collectionData(collection(this.firestore, 'matches'), { idField: 'id' }) as Observable<MatchRow[]>;

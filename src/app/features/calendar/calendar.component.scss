@@ -10,7 +10,7 @@
 
 .hello {
     margin: 0;
-    color: var(--primary);
+    color: var(--accent);
     font-weight: 900;
     font-size: 12px;
 }
@@ -26,6 +26,10 @@ h1 {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     padding: 12px;
+}
+
+.summary-card div {
+    text-align: center;
 }
 
 .summary-card strong {
