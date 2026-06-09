@@ -23,18 +23,45 @@ h1 {
 
 .summary-card {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 10px;
+    align-items: stretch;
 }
 
 .summary-card div {
+    min-width: 0;
+    padding: 8px 6px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .06);
     text-align: center;
+}
+
+.summary-card span {
+    display: block;
+    font-size: 10px;
+    line-height: 1;
+    margin-bottom: 5px;
+    white-space: nowrap;
 }
 
 .summary-card strong {
     display: block;
-    font-size: 20px;
+    font-size: 15px;
+    line-height: 1.1;
+    font-weight: 1000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.summary-card small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 700;
 }
 
 .calendar-content {
@@ -74,7 +101,7 @@ h1 {
 }
 
 .match-topline strong {
-    color: #67e8f9;
+    color: var(--accent);
 }
 
 .match-topline span {
@@ -197,4 +224,26 @@ h1 {
     border-radius: 999px;
     background: rgba(255, 255, 255, .10);
     font-size: 13px;
+}
+
+.match-points-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 10px 0 14px;
+}
+
+.match-points-row span {
+    border-radius: 999px;
+    padding: 7px 8px;
+    background: #cfd3341f;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.potential-points-card {
+    justify-items: center;
+    margin-bottom: 10px;
 }

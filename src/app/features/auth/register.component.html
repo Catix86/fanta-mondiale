@@ -11,12 +11,27 @@
       <select class="input" formControlName="championPick">
         <option value="">Scegli vincente Mondiale</option>
         @for(team of teams; track team) {
-          <option [value]="team">{{ team }}</option>
+        <option [value]="team">{{ team }}</option>
         }
       </select>
 
+      @if(selectedChampionPoints() !== null) {
+      <div class="champion-points-preview">
+        <span>Bonus vincente</span>
+
+        <strong>
+          +{{ selectedChampionPoints() }} pt
+        </strong>
+
+        <p>
+          Se <b>{{ selectedChampionPick() }}</b> vince il Mondiale,
+          guadagni {{ selectedChampionPoints() }} punti bonus.
+        </p>
+      </div>
+      }
+
       @if(error()) {
-        <p class="error-message">{{ error() }}</p>
+      <p class="error-message">{{ error() }}</p>
       }
 
       <button class="btn warn" [disabled]="form.invalid || loading()">Registrati e blocca scelta</button>

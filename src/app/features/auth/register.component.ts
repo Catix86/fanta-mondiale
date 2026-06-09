@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { WORLD_CUP_TEAMS } from '../../core/constants/teams';
+import { getChampionWinnerPoints } from '../../core/utils/dynamic-scoring';
 
 @Component({
   standalone: true,
@@ -25,6 +26,20 @@ export class RegisterComponent {
     confirmPassword: ['', Validators.required],
     championPick: ['', Validators.required]
   });
+
+  selectedChampionPick(): string {
+    return this.form.controls.championPick.value;
+  }
+
+  selectedChampionPoints(): number | null {
+    const championPick = this.selectedChampionPick();
+
+    if (!championPick) {
+      return null;
+    }
+
+    return getChampionWinnerPoints(championPick);
+  }
 
   async submit(): Promise<void> {
     if (this.form.invalid) return;

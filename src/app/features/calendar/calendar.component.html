@@ -16,6 +16,14 @@
             <strong>{{ user.points || 0 }}</strong>
         </div>
         <div>
+            <span class="muted">Esiti</span>
+            <strong>{{ calendarStats().correctOutcomesPercent }}%</strong>
+            </div>
+            <div>
+                <span class="muted">Esatti</span>
+                <strong>{{ calendarStats().exactResultsPercent }}%</strong>
+            </div>
+            <div>
             <span class="muted">Vincente</span>
             <strong>{{ user.championPick }}</strong>
         </div>
@@ -56,6 +64,21 @@
             <strong>{{ match.awayTeam }}</strong>
         </div>
 
+        <div class="match-points-row">
+            <span>1 = {{ outcomePoints(match).homeWinPoints }} pt</span>
+            <span>X = {{ outcomePoints(match).drawPoints }} pt</span>
+            <span>2 = {{ outcomePoints(match).awayWinPoints }} pt</span>
+        </div>
+
+        <div class="potential-points-card">
+            <div>
+                <span>Risultato esatto</span>
+                <strong>
+                    +{{ potentialPredictionPoints(match).exactTotal }} pt
+                </strong>
+            </div>
+        </div>
+
         @if(match.status === 'finished') {
         <p class="official-result">Risultato ufficiale:
             <strong>{{ match.officialHomeGoals }}-{{ match.officialAwayGoals }}</strong></p>
@@ -69,12 +92,18 @@
         </div>
 
         <button class="btn" [disabled]="savingMatchId() === match.id" (click)="save(match)">
-            @if(savingMatchId() === match.id) { Salvataggio... } @else { Salva pronostico }
+            @if(savingMatchId() === match.id) {
+            Salvataggio...
+            } @else if(hasExistingPrediction(match.id)) {
+            Aggiorna pronostico
+            } @else {
+            Salva pronostico
+            }
         </button>
         } @else {
         <p class="locked-message">Pronostico bloccato</p>
         }
-        @if(matchPredictions(match.id).length > 0) {
+        @if(locked(match) && matchPredictions(match.id).length > 0) {
         <div class="other-predictions">
             <div class="other-predictions-header">
                 <strong>Pronostici dei giocatori</strong>

@@ -14,8 +14,14 @@ import {
   collection,
   collectionData
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
 import { Prediction } from '../../core/models/prediction.model';
+import {
+  getMatchOutcomePoints,
+  MatchOutcomePoints,
+  calculatePotentialPredictionPoints,
+  PotentialPredictionPoints
+} from '../../core/utils/dynamic-scoring';
+
 
 
 interface CalendarUser {
@@ -28,6 +34,14 @@ interface MatchPredictionView {
   username: string;
   predictedHomeGoals: number;
   predictedAwayGoals: number;
+}
+
+interface CalendarStats {
+  finishedMatches: number;
+  exactResults: number;
+  correctOutcomes: number;
+  exactResultsPercent: number;
+  correctOutcomesPercent: number;
 }
 
 @Component({
@@ -55,6 +69,18 @@ export class CalendarComponent {
   usersMap: Record<string, string> = {};
 
   drafts: Record<string, { home: number; away: number }> = {};
+  existingPredictionMatchIds: Record<string, boolean> = {};
+
+  calendarStats = signal<CalendarStats>({
+    finishedMatches: 0,
+    exactResults: 0,
+    correctOutcomes: 0,
+    exactResultsPercent: 0,
+    correctOutcomesPercent: 0
+  });
+
+  private currentUserPredictions: Prediction[] = [];
+  private currentMatches: Match[] = [];
 
   constructor() {
     this.auth.firebaseUser$
@@ -68,13 +94,30 @@ export class CalendarComponent {
         }),
         takeUntilDestroyed(this.destroyRef)
       )
+
       .subscribe(predictions => {
+        const existing: Record<string, boolean> = {};
+        this.currentUserPredictions = predictions;
+
         for (const prediction of predictions) {
           this.drafts[prediction.matchId] = {
             home: prediction.predictedHomeGoals,
             away: prediction.predictedAwayGoals
           };
+
+          existing[prediction.matchId] = true;
         }
+
+        this.recalculateCalendarStats();
+        this.existingPredictionMatchIds = existing;
+      });
+
+
+    this.matches$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(matches => {
+        this.currentMatches = matches;
+        this.recalculateCalendarStats();
       });
 
     collectionData(collection(this.firestore, 'users'), { idField: 'uid' })
@@ -94,6 +137,24 @@ export class CalendarComponent {
       .subscribe(predictions => {
         this.allPredictions = predictions;
       });
+  }
+
+  hasExistingPrediction(matchId: string): boolean {
+    return Boolean(this.existingPredictionMatchIds[matchId]);
+  }
+
+  outcomePoints(match: Match): MatchOutcomePoints {
+    return getMatchOutcomePoints(match);
+  }
+
+  potentialPredictionPoints(match: Match): PotentialPredictionPoints {
+    const draft = this.draft(match.id);
+
+    return calculatePotentialPredictionPoints(
+      match,
+      Number(draft.home),
+      Number(draft.away)
+    );
   }
 
   draft(matchId: string): { home: number; away: number } {
@@ -127,6 +188,79 @@ export class CalendarComponent {
       .sort((a, b) => a.username.localeCompare(b.username));
   }
 
+  private recalculateCalendarStats(): void {
+    const finishedMatches = this.currentMatches.filter(match =>
+      match.status === 'finished' &&
+      typeof match.officialHomeGoals === 'number' &&
+      typeof match.officialAwayGoals === 'number'
+    );
+
+    const predictionsByMatchId = new Map<string, Prediction>();
+
+    for (const prediction of this.currentUserPredictions) {
+      predictionsByMatchId.set(prediction.matchId, prediction);
+    }
+
+    let exactResults = 0;
+    let correctOutcomes = 0;
+
+    for (const match of finishedMatches) {
+      const prediction = predictionsByMatchId.get(match.id);
+
+      if (!prediction) {
+        continue;
+      }
+
+      const officialOutcome = this.resultOutcome(
+        match.officialHomeGoals!,
+        match.officialAwayGoals!
+      );
+
+      const predictedOutcome = this.resultOutcome(
+        prediction.predictedHomeGoals,
+        prediction.predictedAwayGoals
+      );
+
+      const exact =
+        prediction.predictedHomeGoals === match.officialHomeGoals &&
+        prediction.predictedAwayGoals === match.officialAwayGoals;
+
+      if (predictedOutcome === officialOutcome) {
+        correctOutcomes += 1;
+      }
+
+      if (exact) {
+        exactResults += 1;
+      }
+    }
+
+    const total = finishedMatches.length;
+
+    this.calendarStats.set({
+      finishedMatches: total,
+      exactResults,
+      correctOutcomes,
+      exactResultsPercent: total > 0
+        ? Math.round((exactResults / total) * 100)
+        : 0,
+      correctOutcomesPercent: total > 0
+        ? Math.round((correctOutcomes / total) * 100)
+        : 0
+    });
+  }
+
+  private resultOutcome(homeGoals: number, awayGoals: number): '1' | 'X' | '2' {
+    if (homeGoals > awayGoals) {
+      return '1';
+    }
+
+    if (homeGoals < awayGoals) {
+      return '2';
+    }
+
+    return 'X';
+  }
+
   async save(match: Match): Promise<void> {
     this.successMessage.set('');
     this.errorMessage.set('');
@@ -154,6 +288,7 @@ export class CalendarComponent {
 
     try {
       await this.predictions.savePrediction(match, homeGoals, awayGoals);
+      this.existingPredictionMatchIds[match.id] = true;
       this.successMessage.set('Pronostico salvato correttamente.');
     } catch (error) {
       console.error('Errore salvataggio pronostico:', error);

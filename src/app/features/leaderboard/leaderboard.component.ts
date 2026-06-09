@@ -1,28 +1,26 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { Firestore, collection, collectionData, doc, docData } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  collectionData,
+  doc,
+  docData
+} from '@angular/fire/firestore';
 import { combineLatest, map, Observable, of, catchError } from 'rxjs';
-import { SCORING_RULES, outcome } from '../../core/utils/scoring';
 import { AuthService } from '../../core/services/auth.service';
+import { Match } from '../../core/models/match.model';
+import { Prediction } from '../../core/models/prediction.model';
+import {
+  calculatePredictionScore,
+  getChampionWinnerPoints,
+  isSameChampionPick
+} from '../../core/utils/dynamic-scoring';
 
 interface AppUserRow {
   uid: string;
   username: string;
   championPick: string;
-}
-
-interface MatchRow {
-  id: string;
-  status: 'scheduled' | 'live' | 'finished';
-  officialHomeGoals?: number;
-  officialAwayGoals?: number;
-}
-
-interface PredictionRow {
-  uid: string;
-  matchId: string;
-  predictedHomeGoals: number;
-  predictedAwayGoals: number;
 }
 
 interface WorldCupSettings {
@@ -48,13 +46,25 @@ interface LeaderboardRow {
 export class LeaderboardComponent {
   private firestore = inject(Firestore);
   private auth = inject(AuthService);
-  
+
   user$ = this.auth.appUser$;
 
-  private users$ = collectionData(collection(this.firestore, 'users')) as Observable<AppUserRow[]>;
-  private matches$ = collectionData(collection(this.firestore, 'matches'), { idField: 'id' }) as Observable<MatchRow[]>;
-  private predictions$ = collectionData(collection(this.firestore, 'predictions')) as Observable<PredictionRow[]>;
-  private settings$ = (docData(doc(this.firestore, 'settings/worldCup')) as Observable<WorldCupSettings>).pipe(
+  private users$ = collectionData(
+    collection(this.firestore, 'users')
+  ) as Observable<AppUserRow[]>;
+
+  private matches$ = collectionData(
+    collection(this.firestore, 'matches'),
+    { idField: 'id' }
+  ) as Observable<Match[]>;
+
+  private predictions$ = collectionData(
+    collection(this.firestore, 'predictions')
+  ) as Observable<Prediction[]>;
+
+  private settings$ = (
+    docData(doc(this.firestore, 'settings/worldCup')) as Observable<WorldCupSettings>
+  ).pipe(
     catchError(() => of({} as WorldCupSettings))
   );
 
@@ -65,52 +75,61 @@ export class LeaderboardComponent {
     this.settings$
   ]).pipe(
     map(([users, matches, predictions, settings]) => {
-      const finishedMatches = new Map<string, MatchRow>();
+      const matchesMap = new Map<string, Match>();
 
       for (const match of matches) {
-        if (match.status === 'finished' && typeof match.officialHomeGoals === 'number' && typeof match.officialAwayGoals === 'number') {
-          finishedMatches.set(match.id, match);
-        }
+        matchesMap.set(match.id, match);
       }
 
-      return users.map(user => {
-        let points = 0;
-        let exactResults = 0;
-        let correctOutcomes = 0;
-        const userPredictions = predictions.filter(p => p.uid === user.uid);
+      return users
+        .map(user => {
+          let points = 0;
+          let exactResults = 0;
+          let correctOutcomes = 0;
 
-        for (const prediction of userPredictions) {
-          const match = finishedMatches.get(prediction.matchId);
-          if (!match) continue;
+          const userPredictions = predictions.filter(p => p.uid === user.uid);
 
-          const exact = prediction.predictedHomeGoals === match.officialHomeGoals && prediction.predictedAwayGoals === match.officialAwayGoals;
-          if (exact) {
-            points += SCORING_RULES.EXACT_RESULT;
-            exactResults += 1;
-            continue;
+          for (const prediction of userPredictions) {
+            const match = matchesMap.get(prediction.matchId);
+
+            if (!match) {
+              continue;
+            }
+
+            const score = calculatePredictionScore(
+              match,
+              prediction
+            );
+
+            points += score.points;
+
+            if (score.exactResult) {
+              exactResults += 1;
+            } else if (score.correctOutcome) {
+              correctOutcomes += 1;
+            }
           }
 
-          const predictedOutcome = outcome(prediction.predictedHomeGoals, prediction.predictedAwayGoals);
-          const officialOutcome = outcome(match.officialHomeGoals!, match.officialAwayGoals!);
-          if (predictedOutcome === officialOutcome) {
-            points += SCORING_RULES.CORRECT_OUTCOME;
-            correctOutcomes += 1;
+          const championBonus = isSameChampionPick(
+            settings?.winner,
+            user.championPick
+          );
+
+          if (championBonus) {
+            points += getChampionWinnerPoints(user.championPick);
           }
-        }
 
-        const championBonus = Boolean(settings?.winner) && settings.winner === user.championPick;
-        if (championBonus) points += SCORING_RULES.CHAMPION_WINNER;
-
-        return {
-          uid: user.uid,
-          username: user.username,
-          championPick: user.championPick,
-          points,
-          exactResults,
-          correctOutcomes,
-          championBonus
-        };
-      }).sort((a, b) => b.points - a.points);
+          return {
+            uid: user.uid,
+            username: user.username,
+            championPick: user.championPick,
+            points,
+            exactResults,
+            correctOutcomes,
+            championBonus
+          };
+        })
+        .sort((a, b) => b.points - a.points);
     })
   );
 }
