@@ -142,3 +142,7 @@ a {
   background: var(--accent);
   color: #020617;
 }
+
+.bottom-nav-inner.cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}

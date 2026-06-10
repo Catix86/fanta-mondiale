@@ -1,10 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
+import { map, Observable } from 'rxjs';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { MatchService } from '../../core/services/match.service';
 import { Match, MatchStage } from '../../core/models/match.model';
 import { WORLD_CUP_TEAMS } from '../../core/constants/teams';
+import { TeamEventService } from '../../core/services/team-event.service';
+import { FANTATEAM_RULES } from '../../core/constants/fantateam-rules';
 
 @Component({
   standalone: true,
@@ -19,10 +22,34 @@ export class AdminComponent {
   teams = WORLD_CUP_TEAMS;
   matches$ = this.matches.getMatches();
 
+  matchTeams$: Observable<string[]> = this.matches$.pipe(
+    map(matches => {
+      const teams = matches.flatMap(match => [
+        match.homeTeam,
+        match.awayTeam
+      ]);
+
+      return Array.from(new Set(teams))
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, 'it'));
+    })
+  );
+
+
   savingMatchId = signal<string | null>(null);
   creatingMatch = signal(false);
   successMessage = signal('');
   errorMessage = signal('');
+
+  private teamEvents = inject(TeamEventService);
+
+  rules = FANTATEAM_RULES;
+
+  teamEventForm = this.fb.nonNullable.group({
+    matchId: ['', Validators.required],
+    teamName: ['', Validators.required],
+    ruleId: ['', Validators.required]
+  });
 
   stages: { label: string; value: MatchStage }[] = [
     { label: 'Girone', value: 'group' },
@@ -156,6 +183,38 @@ export class AdminComponent {
       this.errorMessage.set('Import non riuscito. Verifica ruolo admin e Firestore Rules.');
     } finally {
       this.creatingMatch.set(false);
+    }
+  }
+
+  async addTeamEvent(): Promise<void> {
+    this.successMessage.set('');
+    this.errorMessage.set('');
+
+    if (this.teamEventForm.invalid) {
+      this.teamEventForm.markAllAsTouched();
+      this.errorMessage.set('Seleziona partita, squadra e bonus/malus.');
+      return;
+    }
+
+    const value = this.teamEventForm.getRawValue();
+
+    try {
+      await this.teamEvents.addTeamEvent(
+        value.matchId,
+        value.teamName,
+        value.ruleId
+      );
+
+      this.successMessage.set('Bonus/Malus squadra inserito correttamente.');
+
+      this.teamEventForm.reset({
+        matchId: '',
+        teamName: '',
+        ruleId: ''
+      });
+    } catch (error) {
+      console.error('Errore inserimento bonus/malus:', error);
+      this.errorMessage.set('Bonus/Malus non inserito. Verifica ruolo admin e rules.');
     }
   }
 }

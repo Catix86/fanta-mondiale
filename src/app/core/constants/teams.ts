@@ -9,7 +9,7 @@ export const WORLD_CUP_TEAMS = [
   'Brasile',
   'Canada',
   'Capo Verde',
-  'Cechia',
+  'Repubblica Ceca',
   'Colombia',
   'Corea del Sud',
   'Costa d\'Avorio',

@@ -2,14 +2,16 @@
   <router-outlet />
 
   @if(user$ | async; as user) {
-    <nav class="bottom-nav">
-      <div class="bottom-nav-inner" [class.cols-3]="user.role === 'admin'" [class.cols-2]="user.role !== 'admin'">
-        <a routerLink="/calendario" routerLinkActive="active" class="nav-btn">Calendario</a>
-        <a routerLink="/classifica" routerLinkActive="active" class="nav-btn">Classifica</a>
-        @if(user.role === 'admin') {
-          <a routerLink="/admin" routerLinkActive="active" class="nav-btn">Admin</a>
-        }
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner" [class.cols-4]="user.role === 'admin'" [class.cols-3]="user.role !== 'admin'">
+      <a routerLink="/calendario" routerLinkActive="active" class="nav-btn">📅</a>
+      <a routerLink="/squadra" routerLinkActive="active" class="nav-btn">👕</a>
+      <a routerLink="/classifica" routerLinkActive="active" class="nav-btn">🏆</a>
+
+      @if(user.role === 'admin') {
+      <a routerLink="/admin" routerLinkActive="active" class="nav-btn">🔑</a>
+      }
       </div>
-    </nav>
+      </nav>
   }
 </div>

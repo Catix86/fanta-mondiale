@@ -1,0 +1,127 @@
+<main class="squadra-content">
+    <h1>Squadra</h1>
+
+    @if(successMessage()) {
+    <section class="card success-card">
+        <p>{{ successMessage() }}</p>
+    </section>
+    }
+
+    @if(errorMessage()) {
+    <section class="card error-card">
+        <p>{{ errorMessage() }}</p>
+    </section>
+    }
+
+    @if(!myTeam()) {
+    <section class="card">
+        <h2>Crea il tuo team</h2>
+
+        <p class="muted">
+            Scegli esattamente 6 squadre con un budget massimo di {{ budget }} FC.
+            Una delle 6 sarà il Capitano e raddoppierà bonus e malus.
+        </p>
+
+        <div class="budget-box">
+            <div>
+                <span>Budget usato</span>
+                <strong>{{ usedBudget() }} / {{ budget }} FC</strong>
+            </div>
+
+            <div>
+                <span>Squadre</span>
+                <strong>{{ selectedTeams.length }} / {{ teamSize }}</strong>
+            </div>
+        </div>
+
+        <label class="muted">Capitano</label>
+        <select class="input" [(ngModel)]="selectedCaptain">
+            <option value="">Scegli capitano</option>
+            @for(team of selectedTeams; track team) {
+            <option [value]="team">{{ team }}</option>
+            }
+        </select>
+
+        <button class="btn warn" [disabled]="!canSaveTeam() || loading()" (click)="saveTeam()">
+            @if(loading()) { Salvataggio... } @else { Salva squadra }
+        </button>
+    </section>
+
+    <section class="card">
+        <h2>Mercato squadre</h2>
+
+        <div class="team-market">
+            @for(team of prices; track team.teamName) {
+            <button type="button" class="team-price-card" [class.selected]="isSelected(team.teamName)"
+                (click)="toggleTeam(team.teamName)">
+                <span>{{ team.teamName }}</span>
+                <strong>{{ team.price }} FC</strong>
+            </button>
+            }
+        </div>
+    </section>
+    } @else {
+    <section class="card team-total-card">
+        <span>Punti squadra</span>
+        <strong>{{ totalTeamPoints() }}</strong>
+        <p class="muted">
+            Il capitano raddoppia sia bonus che malus.
+        </p>
+    </section>
+
+    @for(team of teamScores(); track team.teamName) {
+    <section class="card owned-team-card" [class.captain]="team.isCaptain">
+        <div class="owned-team-header">
+            <div>
+                <h2>
+                    {{ team.teamName }}
+                    @if(team.isCaptain) {
+                    <span>Capitano</span>
+                    }
+                </h2>
+
+                <p class="muted">{{ team.price }} FC</p>
+            </div>
+
+            <strong>{{ team.finalPoints }} pt</strong>
+        </div>
+
+        @if(team.events.length === 0) {
+        <p class="muted no-events">
+            Nessun bonus/malus assegnato.
+        </p>
+        }
+
+        @for(event of team.events; track event.id) {
+        <div class="team-event-row">
+            <div>
+                <strong>{{ event.label }}</strong>
+                <p>{{ event.description }}</p>
+            </div>
+
+            <span [class.positive]="event.points > 0" [class.negative]="event.points < 0">
+                {{ team.isCaptain ? event.points * 2 : event.points }} pt
+            </span>
+        </div>
+        }
+    </section>
+    }
+    }
+
+    <section class="card">
+        <h2>Bonus/Malus possibili</h2>
+
+        @for(rule of rules; track rule.id) {
+        <div class="rule-row">
+            <span [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
+                {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
+            </span>
+
+            <div>
+                <strong>{{ rule.label }}</strong>
+                <p>{{ rule.description }}</p>
+            </div>
+        </div>
+        }
+    </section>
+</main>

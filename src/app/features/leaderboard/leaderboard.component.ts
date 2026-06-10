@@ -16,6 +16,9 @@ import {
   getChampionWinnerPoints,
   isSameChampionPick
 } from '../../core/utils/dynamic-scoring';
+import { UserTeam } from '../../core/models/user-team.model';
+import { TeamEvent } from '../../core/models/team-event.model';
+
 
 interface AppUserRow {
   uid: string;
@@ -27,11 +30,14 @@ interface WorldCupSettings {
   winner?: string;
 }
 
+
 interface LeaderboardRow {
   uid: string;
   username: string;
   championPick: string;
   points: number;
+  predictionPoints: number;
+  squadPoints: number;
   exactResults: number;
   correctOutcomes: number;
   championBonus: boolean;
@@ -62,6 +68,16 @@ export class LeaderboardComponent {
     collection(this.firestore, 'predictions')
   ) as Observable<Prediction[]>;
 
+
+  private userTeams$ = collectionData(
+    collection(this.firestore, 'userTeams')
+  ) as Observable<UserTeam[]>;
+
+  private teamEvents$ = collectionData(
+    collection(this.firestore, 'teamEvents'),
+    { idField: 'id' }
+  ) as Observable<TeamEvent[]>;
+
   private settings$ = (
     docData(doc(this.firestore, 'settings/worldCup')) as Observable<WorldCupSettings>
   ).pipe(
@@ -72,9 +88,11 @@ export class LeaderboardComponent {
     this.users$,
     this.matches$,
     this.predictions$,
+    this.userTeams$,
+    this.teamEvents$,
     this.settings$
   ]).pipe(
-    map(([users, matches, predictions, settings]) => {
+    map(([users, matches, predictions, userTeams, teamEvents, settings]) => {
       const matchesMap = new Map<string, Match>();
 
       for (const match of matches) {
@@ -83,7 +101,7 @@ export class LeaderboardComponent {
 
       return users
         .map(user => {
-          let points = 0;
+          let predictionPoints = 0;
           let exactResults = 0;
           let correctOutcomes = 0;
 
@@ -101,7 +119,7 @@ export class LeaderboardComponent {
               prediction
             );
 
-            points += score.points;
+            predictionPoints += score.points;
 
             if (score.exactResult) {
               exactResults += 1;
@@ -110,20 +128,34 @@ export class LeaderboardComponent {
             }
           }
 
+          const userTeam = userTeams.find(team => team.uid === user.uid);
+
+          const squadPoints = this.calculateSquadPoints(
+            userTeam,
+            teamEvents
+          );
+
           const championBonus = isSameChampionPick(
             settings?.winner,
             user.championPick
           );
 
-          if (championBonus) {
-            points += getChampionWinnerPoints(user.championPick);
-          }
+          const championWinnerPoints = championBonus
+            ? getChampionWinnerPoints(user.championPick)
+            : 0;
+
+          const totalPoints =
+            predictionPoints +
+            squadPoints +
+            championWinnerPoints;
 
           return {
             uid: user.uid,
             username: user.username,
             championPick: user.championPick,
-            points,
+            points: totalPoints,
+            predictionPoints,
+            squadPoints,
             exactResults,
             correctOutcomes,
             championBonus
@@ -132,4 +164,27 @@ export class LeaderboardComponent {
         .sort((a, b) => b.points - a.points);
     })
   );
+
+  private calculateSquadPoints(
+    userTeam: UserTeam | undefined,
+    teamEvents: TeamEvent[]
+  ): number {
+    if (!userTeam) {
+      return 0;
+    }
+
+    let total = 0;
+
+    for (const event of teamEvents) {
+      if (!userTeam.teams.includes(event.teamName)) {
+        continue;
+      }
+
+      const multiplier = event.teamName === userTeam.captainTeam ? 2 : 1;
+
+      total += event.points * multiplier;
+    }
+
+    return total;
+  }
 }
