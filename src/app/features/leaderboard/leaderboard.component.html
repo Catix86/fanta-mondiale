@@ -6,23 +6,138 @@
     <span>Classifica</span>
   </h1>
 
+  @if(user$ | async; as currentUser) {
   @if(leaderboard$ | async; as leaderboard) {
-    @if(leaderboard.length === 0) {
-      <section class="card"><p class="muted">Nessun utente in classifica.</p></section>
-    }
+  @if(leaderboard.length === 0) {
+  <section class="card">
+    <p class="muted">Nessun utente in classifica.</p>
+  </section>
+  }
 
-    @for(user of leaderboard; track user.uid; let i = $index) {
-      <section class="card leaderboard-row" [class.first]="user.uid === (user$ | async)?.uid">
-        <div class="rank">{{ i + 1 }}</div>
-        <div class="user-info">
-          <strong>{{ user.username }}</strong>
-          <p>
-            {{ user.exactResults }} esatti · {{ user.correctOutcomes }} esiti · Vincente: {{ user.championPick }}
-            @if(user.championBonus) { · Bonus campione }
-          </p>
-        </div>
-        <strong class="points">{{ user.points }}</strong>
-      </section>
+  @for(user of leaderboard; track user.uid; let i = $index) {
+  <section class="card leaderboard-row" [class.first]="user.uid === currentUser.uid"
+    [class.clickable]="user.uid !== currentUser.uid" (click)="openUserSquad(user, currentUser.uid)">
+    <div class="rank">{{ i + 1 }}</div>
+
+    <div class="user-info">
+      <strong>{{ user.username }} </strong>
+
+      <p class="leaderboard-details">
+        <span>{{ user.exactResults }} risultati esatti</span>
+        <span>{{ user.correctOutcomes }} esiti corretti</span>
+        <span>Pronostici: {{ user.predictionPoints }} pt</span>
+        <span>Squadra: {{ user.squadPoints }} pt</span>
+
+        @if(user.championBonus) {
+        · Bonus campione
+        }
+      </p>
+      @if(user.uid !== currentUser.uid && hasSquad(user)) {
+      <small class="open-squad-hint">
+        Guarda la squadra di {{ user.username }}
+      </small>
+      } @else if(!hasSquad(user)) {
+      <small class="open-no-squad-hint">
+        <span class="material-symbols-rounded warning-icon">
+          warning
+        </span>
+        <span class="warning-text">{{ user.username }} non ha ancora creato la squadra</span>
+      </small>
+      }
+    </div>
+
+    <strong class="points">{{ user.points }}</strong>
+    </section>
     }
+  }
+  }
+
+  @if(selectedUserSquad(); as selectedUser) {
+  <div class="squad-modal-backdrop" (click)="closeUserSquad()">
+    <section class="card squad-modal" (click)="$event.stopPropagation()">
+      <div class="squad-modal-header">
+        <div>
+          <span class="muted">Squadra di</span>
+          <h2>{{ selectedUser.username }}</h2>
+        </div>
+
+        <button type="button" class="squad-modal-close" (click)="closeUserSquad()" aria-label="Chiudi">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="squad-modal-total">
+        <div>
+          <span>Punti squadra</span>
+          <strong>{{ selectedUser.squadPoints }}</strong>
+        </div>
+
+        <div>
+          <span>Totale classifica</span>
+          <strong>{{ selectedUser.points }}</strong>
+        </div>
+      </div>
+
+      @if(selectedUser.teamScores.length === 0) {
+      <p class="muted empty-squad-message">
+        Questo utente non ha ancora creato la squadra.
+      </p>
+      }
+
+      @for(team of selectedUser.teamScores; track team.teamName) {
+      <article class="opponent-team-card" [class.captain]="team.isCaptain">
+        <div class="opponent-team-header">
+          <div class="opponent-team-title">
+            <img class="team-flag" [src]="team.teamName | teamFlag" [alt]="team.teamName" loading="lazy">
+
+            <div>
+              <h3>
+                {{ team.teamName }}
+
+                @if(team.isCaptain) {
+                <span>Capitano</span>
+                }
+              </h3>
+
+              <p class="muted">
+                {{ team.price }} FC · Base {{ team.basePoints }} pt
+              </p>
+            </div>
+          </div>
+
+          <strong>
+            {{ team.finalPoints }} pt
+          </strong>
+        </div>
+
+        @if(team.events.length === 0) {
+        <p class="muted no-events">
+          Nessun bonus/malus assegnato.
+        </p>
+        }
+
+        @for(event of team.events; track event.id) {
+        <div class="opponent-event-row">
+          <div>
+            <strong>{{ event.label }}</strong>
+
+            <p class="muted">
+              {{ event.matchLabel }}
+            </p>
+
+            <small>
+              {{ event.description }}
+            </small>
+          </div>
+
+          <span [class.positive]="event.computedPoints > 0" [class.negative]="event.computedPoints < 0">
+            {{ event.computedPoints > 0 ? '+' : '' }}{{ event.computedPoints }}
+          </span>
+        </div>
+        }
+      </article>
+      }
+    </section>
+  </div>
   }
 </main>

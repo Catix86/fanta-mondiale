@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import {
   Firestore,
@@ -11,14 +11,15 @@ import { combineLatest, map, Observable, of, catchError } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { Match } from '../../core/models/match.model';
 import { Prediction } from '../../core/models/prediction.model';
+import { UserTeam } from '../../core/models/user-team.model';
+import { TeamEvent } from '../../core/models/team-event.model';
 import {
   calculatePredictionScore,
   getChampionWinnerPoints,
   isSameChampionPick
 } from '../../core/utils/dynamic-scoring';
-import { UserTeam } from '../../core/models/user-team.model';
-import { TeamEvent } from '../../core/models/team-event.model';
-
+import { getFantaTeamPrice } from '../../core/constants/fantateam-prices';
+import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
 
 interface AppUserRow {
   uid: string;
@@ -30,6 +31,19 @@ interface WorldCupSettings {
   winner?: string;
 }
 
+interface TeamEventView extends TeamEvent {
+  matchLabel: string;
+  computedPoints: number;
+}
+
+interface TeamScoreView {
+  teamName: string;
+  price: number;
+  isCaptain: boolean;
+  basePoints: number;
+  finalPoints: number;
+  events: TeamEventView[];
+}
 
 interface LeaderboardRow {
   uid: string;
@@ -41,11 +55,12 @@ interface LeaderboardRow {
   exactResults: number;
   correctOutcomes: number;
   championBonus: boolean;
+  teamScores: TeamScoreView[];
 }
 
 @Component({
   standalone: true,
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, TeamFlagPipe],
   templateUrl: './leaderboard.component.html',
   styleUrl: './leaderboard.component.scss'
 })
@@ -54,6 +69,8 @@ export class LeaderboardComponent {
   private auth = inject(AuthService);
 
   user$ = this.auth.appUser$;
+
+  selectedUserSquad = signal<LeaderboardRow | null>(null);
 
   private users$ = collectionData(
     collection(this.firestore, 'users')
@@ -67,7 +84,6 @@ export class LeaderboardComponent {
   private predictions$ = collectionData(
     collection(this.firestore, 'predictions')
   ) as Observable<Prediction[]>;
-
 
   private userTeams$ = collectionData(
     collection(this.firestore, 'userTeams')
@@ -114,10 +130,7 @@ export class LeaderboardComponent {
               continue;
             }
 
-            const score = calculatePredictionScore(
-              match,
-              prediction
-            );
+            const score = calculatePredictionScore(match, prediction);
 
             predictionPoints += score.points;
 
@@ -130,9 +143,15 @@ export class LeaderboardComponent {
 
           const userTeam = userTeams.find(team => team.uid === user.uid);
 
-          const squadPoints = this.calculateSquadPoints(
+          const teamScores = this.buildTeamScores(
             userTeam,
-            teamEvents
+            teamEvents,
+            matchesMap
+          );
+
+          const squadPoints = teamScores.reduce(
+            (total, team) => total + team.finalPoints,
+            0
           );
 
           const championBonus = isSameChampionPick(
@@ -158,33 +177,83 @@ export class LeaderboardComponent {
             squadPoints,
             exactResults,
             correctOutcomes,
-            championBonus
+            championBonus,
+            teamScores
           };
         })
         .sort((a, b) => b.points - a.points);
     })
   );
 
-  private calculateSquadPoints(
+  openUserSquad(user: LeaderboardRow, currentUserUid: string | undefined): void {
+    if (!currentUserUid) {
+      return;
+    }
+
+    if (user.uid === currentUserUid || user.teamScores.length === 0) {
+      return;
+    }
+
+    this.selectedUserSquad.set(user);
+  }
+
+  closeUserSquad(): void {
+    this.selectedUserSquad.set(null);
+  }
+
+  hasSquad(user: LeaderboardRow): boolean {
+    return user.teamScores.length > 0;
+  }
+
+  private buildTeamScores(
     userTeam: UserTeam | undefined,
-    teamEvents: TeamEvent[]
-  ): number {
+    teamEvents: TeamEvent[],
+    matchesMap: Map<string, Match>
+  ): TeamScoreView[] {
     if (!userTeam) {
-      return 0;
+      return [];
     }
 
-    let total = 0;
+    return userTeam.teams.map(teamName => {
+      const isCaptain = userTeam.captainTeam === teamName;
 
-    for (const event of teamEvents) {
-      if (!userTeam.teams.includes(event.teamName)) {
-        continue;
-      }
+      const events = teamEvents
+        .filter(event => event.teamName === teamName)
+        .map(event => {
+          const match = matchesMap.get(event.matchId);
 
-      const multiplier = event.teamName === userTeam.captainTeam ? 2 : 1;
+          const matchLabel = match
+            ? `${match.homeTeam} - ${match.awayTeam}`
+            : 'Partita non trovata';
 
-      total += event.points * multiplier;
-    }
+          const computedPoints = isCaptain
+            ? event.points * 2
+            : event.points;
 
-    return total;
+          return {
+            ...event,
+            matchLabel,
+            computedPoints
+          };
+        });
+
+      const basePoints = events.reduce(
+        (total, event) => total + event.points,
+        0
+      );
+
+      const finalPoints = isCaptain
+        ? basePoints * 2
+        : basePoints;
+
+      return {
+        teamName,
+        price: getFantaTeamPrice(teamName),
+        isCaptain,
+        basePoints,
+        finalPoints,
+        events
+      };
+    });
   }
 }
