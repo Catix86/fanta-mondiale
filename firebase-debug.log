@@ -1,0 +1,73 @@
+[debug] [2026-06-10T18:01:31.686Z] ----------------------------------------------------------------------
+[debug] [2026-06-10T18:01:31.689Z] Command:       C:\nodejs\node.exe C:\nodejs\npm_global\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2026-06-10T18:01:31.689Z] CLI Version:   15.19.1
+[debug] [2026-06-10T18:01:31.689Z] Platform:      win32
+[debug] [2026-06-10T18:01:31.689Z] Node Version:  v24.15.0
+[debug] [2026-06-10T18:01:31.690Z] Time:          Wed Jun 10 2026 20:01:31 GMT+0200 (Ora legale dell’Europa centrale)
+[debug] [2026-06-10T18:01:31.690Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-10T18:01:32.943Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-10T18:01:32.943Z] > authorizing via signed-in user (m.catix86@gmail.com)
+[debug] [2026-06-10T18:01:32.943Z] [iam] checking project fanta-mondiale-ea9d7 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-06-10T18:01:32.944Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:32.944Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:32.945Z] > refreshing access token with scopes: []
+[debug] [2026-06-10T18:01:32.946Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-10T18:01:32.946Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:33.132Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-10T18:01:33.132Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:33.133Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/fanta-mondiale-ea9d7:testIamPermissions [none]
+[debug] [2026-06-10T18:01:33.133Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/fanta-mondiale-ea9d7:testIamPermissions  x-goog-user-project=fanta-mondiale-ea9d7
+[debug] [2026-06-10T18:01:33.133Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fanta-mondiale-ea9d7:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-06-10T18:01:33.368Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/fanta-mondiale-ea9d7:testIamPermissions 401
+[debug] [2026-06-10T18:01:33.368Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fanta-mondiale-ea9d7:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.cloudresourcemanager.v1.Projects.TestIamPermissions","service":"cloudresourcemanager.googleapis.com"}}]}}
+[debug] [2026-06-10T18:01:33.368Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-10T18:01:33.369Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:33.369Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:33.369Z] > refreshing access token with scopes: []
+[debug] [2026-06-10T18:01:33.370Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-10T18:01:33.371Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:33.429Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-10T18:01:33.429Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:33.429Z] [iam] error while checking permissions, command may fail: Request to https://cloudresourcemanager.googleapis.com/v1/projects/fanta-mondiale-ea9d7:testIamPermissions had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2026-06-10T18:01:33.429Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:33.430Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:33.430Z] > refreshing access token with scopes: []
+[debug] [2026-06-10T18:01:33.430Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-10T18:01:33.430Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:33.487Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-10T18:01:33.488Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:33.488Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/fanta-mondiale-ea9d7/serviceAccounts/fanta-mondiale-ea9d7@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-06-10T18:01:33.489Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/fanta-mondiale-ea9d7/serviceAccounts/fanta-mondiale-ea9d7@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-06-10T18:01:34.241Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/fanta-mondiale-ea9d7/serviceAccounts/fanta-mondiale-ea9d7@appspot.gserviceaccount.com:testIamPermissions 401
+[debug] [2026-06-10T18:01:34.242Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/fanta-mondiale-ea9d7/serviceAccounts/fanta-mondiale-ea9d7@appspot.gserviceaccount.com:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.iam.admin.v1.IAM.TestIamPermissions","service":"iam.googleapis.com"}}]}}
+[debug] [2026-06-10T18:01:34.242Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-10T18:01:34.242Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:34.242Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:34.242Z] > refreshing access token with scopes: []
+[debug] [2026-06-10T18:01:34.243Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-10T18:01:34.244Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:34.304Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-10T18:01:34.304Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:34.305Z] [functions] service account IAM check errored, deploy may fail: Request to https://iam.googleapis.com/v1/projects/fanta-mondiale-ea9d7/serviceAccounts/fanta-mondiale-ea9d7@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project. {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.iam.admin.v1.IAM.TestIamPermissions","service":"iam.googleapis.com"}}]}},"response":{"statusCode":401}},"exit":1,"message":"Request to https://iam.googleapis.com/v1/projects/fanta-mondiale-ea9d7/serviceAccounts/fanta-mondiale-ea9d7@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":401}
+[debug] [2026-06-10T18:01:34.307Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:34.307Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:34.307Z] > refreshing access token with scopes: []
+[debug] [2026-06-10T18:01:34.308Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-10T18:01:34.308Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:34.366Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-10T18:01:34.367Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:34.368Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fanta-mondiale-ea9d7 [none]
+[debug] [2026-06-10T18:01:34.514Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fanta-mondiale-ea9d7 401
+[debug] [2026-06-10T18:01:34.514Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fanta-mondiale-ea9d7 {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2026-06-10T18:01:34.514Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-10T18:01:34.515Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:34.515Z] Checked if tokens are valid: false, expires at: 1670946622781
+[debug] [2026-06-10T18:01:34.515Z] > refreshing access token with scopes: []
+[debug] [2026-06-10T18:01:34.515Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-10T18:01:34.515Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:34.573Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-10T18:01:34.573Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-10T18:01:34.574Z] Request to https://firebase.googleapis.com/v1beta1/projects/fanta-mondiale-ea9d7 had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier
