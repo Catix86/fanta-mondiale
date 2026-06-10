@@ -3,15 +3,25 @@
 
   @if(user$ | async; as user) {
   <nav class="bottom-nav">
-    <div class="bottom-nav-inner" [class.cols-4]="user.role === 'admin'" [class.cols-3]="user.role !== 'admin'">
-      <a routerLink="/calendario" routerLinkActive="active" class="nav-btn">📅</a>
-      <a routerLink="/squadra" routerLinkActive="active" class="nav-btn">👕</a>
-      <a routerLink="/classifica" routerLinkActive="active" class="nav-btn">🏆</a>
-
+    <div class="bottom-nav-inner" [class.cols-5]="user.role === 'admin'" [class.cols-4]="user.role !== 'admin'">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-btn" aria-label="Dashboard">
+        <span class="material-symbols-rounded">dashboard</span>
+      </a>
+      <a routerLink="/calendario" routerLinkActive="active" class="nav-btn" aria-label="Calendario">
+        <span class="material-symbols-rounded">calendar_month</span>
+      </a>
+      <a routerLink="/squadra" routerLinkActive="active" class="nav-btn" aria-label="Squadra">
+        <span class="material-symbols-rounded">apparel</span>
+      </a>
+      <a routerLink="/classifica" routerLinkActive="active" class="nav-btn" aria-label="Classifica">
+        <span class="material-symbols-rounded">leaderboard</span>
+      </a>
       @if(user.role === 'admin') {
-      <a routerLink="/admin" routerLinkActive="active" class="nav-btn">🔑</a>
+      <a routerLink="/admin" routerLinkActive="active" class="nav-btn" aria-label="Admin">
+        <span class="material-symbols-rounded">admin_panel_settings</span>
+      </a>
       }
-      </div>
-      </nav>
+    </div>
+    </nav>
   }
 </div>

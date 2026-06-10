@@ -1,5 +1,10 @@
 <main class="leaderboard-content">
-  <h1>Classifica</h1>
+  <h1 class="leaderboard-title">
+    <span class="material-symbols-rounded leaderboard-title-icon">
+      leaderboard
+    </span>
+    <span>Classifica</span>
+  </h1>
 
   @if(leaderboard$ | async; as leaderboard) {
     @if(leaderboard.length === 0) {

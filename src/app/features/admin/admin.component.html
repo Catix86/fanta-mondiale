@@ -1,5 +1,11 @@
 <main class="admin-content">
-  <h1>Admin</h1>
+  <h1 class="admin-title">
+    <span class="material-symbols-rounded admin-title-icon">
+      admin_panel_settings
+    </span>
+    <span>Admin</span>
+  </h1>
+
 
   @if(successMessage()) {
   <section class="card success-card">
@@ -74,62 +80,61 @@
       </button>
     </form>
   </section>
+  <section class="card">
+    <h2>Inserisci Bonus/Malus squadra</h2>
+
+    <form [formGroup]="teamEventForm" (ngSubmit)="addTeamEvent()" class="match-form">
+      <div>
+        <label class="muted">Partita</label>
+        <select class="input" formControlName="matchId">
+          <option value="">Seleziona partita</option>
+
+          @if(matches$ | async; as matches) {
+          @for(match of matches; track match.id) {
+          <option [value]="match.id">
+            {{ match.homeTeam }} - {{ match.awayTeam }}
+          </option>
+          }
+          }
+          </select>
+          </div>
+
+      <div>
+        <label class="muted">Squadra</label>
+        <select class="input" formControlName="teamName">
+          <option value="">Seleziona squadra</option>
+
+          @if(matchTeams$ | async; as teams) {
+          @for(team of teams; track team) {
+          <option [value]="team">{{ team }}</option>
+          }
+          }
+          </select>
+          </div>
+
+      <div>
+        <label class="muted">Bonus/Malus</label>
+        <select class="input" formControlName="ruleId">
+          <option value="">Seleziona bonus/malus</option>
+
+          @for(rule of rules; track rule.id) {
+          <option [value]="rule.id">
+            {{ rule.points > 0 ? '+' : '' }}{{ rule.points }} - {{ rule.label }}
+          </option>
+          }
+          </select>
+          </div>
+
+      <button class="btn warn" type="submit">
+        Inserisci Bonus/Malus
+      </button>
+      </form>
+  </section>
 
   <section class="card">
     <h2>Gestione risultati</h2>
     <p class="muted">Inserisci il risultato ufficiale. Quando salvi, la partita passa allo stato
       <strong>finished</strong>.</p>
-    </section>
-
-    <section class="card">
-      <h2>Inserisci Bonus/Malus squadra</h2>
-
-      <form [formGroup]="teamEventForm" (ngSubmit)="addTeamEvent()" class="match-form">
-        <div>
-          <label class="muted">Partita</label>
-          <select class="input" formControlName="matchId">
-            <option value="">Seleziona partita</option>
-
-            @if(matches$ | async; as matches) {
-            @for(match of matches; track match.id) {
-            <option [value]="match.id">
-              {{ match.homeTeam }} - {{ match.awayTeam }}
-            </option>
-            }
-            }
-          </select>
-        </div>
-
-        <div>
-          <label class="muted">Squadra</label>
-          <select class="input" formControlName="teamName">
-            <option value="">Seleziona squadra</option>
-
-            @if(matchTeams$ | async; as teams) {
-            @for(team of teams; track team) {
-            <option [value]="team">{{ team }}</option>
-            }
-            }
-          </select>
-        </div>
-
-        <div>
-          <label class="muted">Bonus/Malus</label>
-          <select class="input" formControlName="ruleId">
-            <option value="">Seleziona bonus/malus</option>
-
-            @for(rule of rules; track rule.id) {
-            <option [value]="rule.id">
-              {{ rule.points > 0 ? '+' : '' }}{{ rule.points }} - {{ rule.label }}
-            </option>
-            }
-          </select>
-        </div>
-
-        <button class="btn warn" type="submit">
-          Inserisci Bonus/Malus
-        </button>
-      </form>
   </section>
 
   @if(matches$ | async; as matches) {
@@ -162,8 +167,8 @@
         @if(savingMatchId() === match.id) { Salvo... } @else { Salva }
       </button>
     </div>
-    </section>
-    }
+  </section>
+  }
   } @else {
   <section class="card">
     <p class="muted">Caricamento partite...</p>

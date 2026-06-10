@@ -19,6 +19,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/shell/mobile-shell.component').then(m => m.MobileShellComponent),
     children: [
       {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
         path: 'calendario',
         loadComponent: () => import('./features/calendar/calendar.component').then(m => m.CalendarComponent)
       },
@@ -39,7 +43,7 @@ export const routes: Routes = [
       {
         path:
           '',
-        redirectTo: 'calendario',
+        redirectTo: 'dashboard',
         pathMatch: 'full'
       }
     ]

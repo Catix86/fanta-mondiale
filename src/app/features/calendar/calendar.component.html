@@ -1,37 +1,11 @@
-<header class="calendar-header">
-    @if(user$ | async; as user) {
-    <div class="calendar-user-row">
-        <div>
-            <p class="hello">Ciao, {{ user.username }}</p>
-            <h1>Fanta Mondiale 2026</h1>
-        </div>
-
-        <button type="button" class="logout-button" (click)="logout()" aria-label="Esci">
-            Logout
-        </button>
-    </div>
-    <div class="card summary-card">
-        <div>
-            <span class="muted">Punti</span>
-            <strong>{{ user.points || 0 }}</strong>
-        </div>
-        <div>
-            <span class="muted">Esiti</span>
-            <strong>{{ calendarStats().correctOutcomesPercent }}%</strong>
-        </div>
-        <div>
-            <span class="muted">Esatti</span>
-            <strong>{{ calendarStats().exactResultsPercent }}%</strong>
-        </div>
-        <div>
-            <span class="muted">Vincente</span>
-            <strong>{{ user.championPick }}</strong>
-        </div>
-    </div>
-    }
-</header>
-
 <main class="calendar-content">
+    <h1 class="calendar-title">
+        <span class="material-symbols-rounded calendar-title-icon">
+            calendar_month
+        </span>
+        <span>Calendario</span>
+    </h1>
+
     @if(successMessage()) {
     <section class="card success-card">
         <p>{{ successMessage() }}</p>
@@ -65,8 +39,8 @@
             </div>
 
             <span class="muted">vs</span>
-<div class="team-name-with-flag">
-    <img class="team-flag" [src]="match.awayTeam | teamFlag" [alt]="match.awayTeam" loading="lazy">
+            <div class="team-name-with-flag">
+                <img class="team-flag" [src]="match.awayTeam | teamFlag" [alt]="match.awayTeam" loading="lazy">
                 <strong>{{ match.awayTeam }}</strong>
             </div>
         </div>

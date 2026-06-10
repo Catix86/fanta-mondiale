@@ -218,3 +218,28 @@ h2 {
     align-items: center;
     white-space: nowrap;
 }
+
+.team-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 30px;
+    line-height: 1;
+    margin: 8px 0;
+    font-weight: 1000;
+}
+
+.team-title-icon {
+    font-size: 1em;
+    line-height: 1;
+    width: 1em;
+    height: 1em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 700,
+        'GRAD' 0,
+        'opsz' 32;
+}

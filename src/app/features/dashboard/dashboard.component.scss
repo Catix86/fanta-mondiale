@@ -1,0 +1,110 @@
+.dashboard-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(2, 6, 23, .9);
+    backdrop-filter: blur(14px);
+    padding: 16px;
+    border-bottom: 1px solid var(--accent);
+}
+
+.dashboard-user-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.hello {
+    margin: 0;
+    color: var(--accent);
+    font-weight: 900;
+    font-size: 12px;
+}
+
+h1 {
+    margin: 2px 0 8px;
+    font-size: 28px;
+    font-weight: 1000;
+}
+
+.dashboard-content {
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+    background: #020617e6;
+}
+
+.logout-button {
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, .08);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.logout-button:active {
+    transform: scale(.98);
+}
+
+.team-flag {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .08);
+}
+
+.team-name-with-flag strong {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info p {
+    margin: 2px 0 0;
+    font-size: 16px;
+    opacity: .75;
+}
+
+.user-info strong {
+    font-size: 20px;
+}
+
+.points {
+    font-size: 30px;
+    color: var(--accent);
+}
+
+.match-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.match-topline strong {
+    color: var(--accent);
+}
+
+.match-topline span {
+    font-size: 12px;
+}
+
+.material-symbols-rounded {
+    color: var(--accent);
+}

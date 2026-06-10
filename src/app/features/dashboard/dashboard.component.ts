@@ -1,0 +1,320 @@
+
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  QueryList,
+  signal,
+  ViewChildren
+} from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatchService } from '../../core/services/match.service';
+import { PredictionService } from '../../core/services/prediction.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Match } from '../../core/models/match.model';
+import { isPredictionLocked } from '../../core/utils/scoring';
+import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, of } from 'rxjs';
+import {
+  Firestore,
+  collection,
+  collectionData
+} from '@angular/fire/firestore';
+import { Prediction } from '../../core/models/prediction.model';
+import {
+  getMatchOutcomePoints,
+  MatchOutcomePoints,
+  calculatePotentialPredictionPoints,
+  PotentialPredictionPoints
+} from '../../core/utils/dynamic-scoring';
+import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
+
+interface CalendarUser {
+  uid: string;
+  username: string;
+}
+
+interface MatchPredictionView {
+  uid: string;
+  username: string;
+  predictedHomeGoals: number;
+  predictedAwayGoals: number;
+}
+
+interface CalendarStats {
+  finishedMatches: number;
+  exactResults: number;
+  correctOutcomes: number;
+  exactResultsPercent: number;
+  correctOutcomesPercent: number;
+}
+
+@Component({
+  standalone: true,
+  imports: [AsyncPipe, FormsModule, TeamFlagPipe],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss'
+})
+export class DashboardComponent {
+  @ViewChildren('matchCard') private matchCards!: QueryList<ElementRef<HTMLElement>>;
+
+  private matches = inject(MatchService);
+  private predictions = inject(PredictionService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+  private firestore = inject(Firestore);
+
+  matches$ = this.matches.getMatches();
+  user$ = this.auth.appUser$;
+
+  savingMatchId = signal<string | null>(null);
+  successMessage = signal('');
+  errorMessage = signal('');
+
+  allPredictions: Prediction[] = [];
+  usersMap: Record<string, string> = {};
+
+  drafts: Record<string, { home: number; away: number }> = {};
+  existingPredictionMatchIds: Record<string, boolean> = {};
+
+  calendarStats = signal<CalendarStats>({
+    finishedMatches: 0,
+    exactResults: 0,
+    correctOutcomes: 0,
+    exactResultsPercent: 0,
+    correctOutcomesPercent: 0
+  });
+
+  private currentUserPredictions: Prediction[] = [];
+  private currentMatches: Match[] = [];
+
+  constructor() {
+    this.auth.firebaseUser$
+      .pipe(
+        switchMap(user => {
+          if (!user) {
+            return of([]);
+          }
+
+          return this.predictions.getUserPredictions(user.uid);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+
+      .subscribe(predictions => {
+        const existing: Record<string, boolean> = {};
+        this.currentUserPredictions = predictions;
+
+        for (const prediction of predictions) {
+          this.drafts[prediction.matchId] = {
+            home: prediction.predictedHomeGoals,
+            away: prediction.predictedAwayGoals
+          };
+
+          existing[prediction.matchId] = true;
+        }
+
+        this.recalculateCalendarStats();
+        this.existingPredictionMatchIds = existing;
+      });
+
+
+    this.matches$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(matches => {
+        this.currentMatches = matches;
+        this.recalculateCalendarStats();
+      });
+
+    collectionData(collection(this.firestore, 'users'), { idField: 'uid' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(users => {
+        const map: Record<string, string> = {};
+
+        for (const user of users as CalendarUser[]) {
+          map[user.uid] = user.username;
+        }
+
+        this.usersMap = map;
+      });
+
+    this.predictions.getAllPredictions()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(predictions => {
+        this.allPredictions = predictions;
+      });
+  }
+
+  hasExistingPrediction(matchId: string): boolean {
+    return Boolean(this.existingPredictionMatchIds[matchId]);
+  }
+
+  outcomePoints(match: Match): MatchOutcomePoints {
+    return getMatchOutcomePoints(match);
+  }
+
+  potentialPredictionPoints(match: Match): PotentialPredictionPoints {
+    const draft = this.draft(match.id);
+
+    return calculatePotentialPredictionPoints(
+      match,
+      Number(draft.home),
+      Number(draft.away)
+    );
+  }
+
+  draft(matchId: string): { home: number; away: number } {
+    if (!this.drafts[matchId]) this.drafts[matchId] = { home: 0, away: 0 };
+    return this.drafts[matchId];
+  }
+
+  matchDate(match: Match): Date {
+    const kickoffAt: any = match.kickoffAt;
+
+    if (kickoffAt?.toDate) {
+      return kickoffAt.toDate();
+    }
+
+    return new Date(kickoffAt);
+  }
+
+  locked(match: Match): boolean {
+    return isPredictionLocked(this.matchDate(match)) || match.status !== 'scheduled';
+  }
+
+  matchPredictions(matchId: string): MatchPredictionView[] {
+    return this.allPredictions
+      .filter(prediction => prediction.matchId === matchId)
+      .map(prediction => ({
+        uid: prediction.uid,
+        username: this.usersMap[prediction.uid] || 'Utente',
+        predictedHomeGoals: prediction.predictedHomeGoals,
+        predictedAwayGoals: prediction.predictedAwayGoals
+      }))
+      .sort((a, b) => a.username.localeCompare(b.username));
+  }
+
+  private recalculateCalendarStats(): void {
+    const finishedMatches = this.currentMatches.filter(match =>
+      match.status === 'finished' &&
+      typeof match.officialHomeGoals === 'number' &&
+      typeof match.officialAwayGoals === 'number'
+    );
+
+    const predictionsByMatchId = new Map<string, Prediction>();
+
+    for (const prediction of this.currentUserPredictions) {
+      predictionsByMatchId.set(prediction.matchId, prediction);
+    }
+
+    let exactResults = 0;
+    let correctOutcomes = 0;
+
+    for (const match of finishedMatches) {
+      const prediction = predictionsByMatchId.get(match.id);
+
+      if (!prediction) {
+        continue;
+      }
+
+      const officialOutcome = this.resultOutcome(
+        match.officialHomeGoals!,
+        match.officialAwayGoals!
+      );
+
+      const predictedOutcome = this.resultOutcome(
+        prediction.predictedHomeGoals,
+        prediction.predictedAwayGoals
+      );
+
+      const exact =
+        prediction.predictedHomeGoals === match.officialHomeGoals &&
+        prediction.predictedAwayGoals === match.officialAwayGoals;
+
+      if (predictedOutcome === officialOutcome) {
+        correctOutcomes += 1;
+      }
+
+      if (exact) {
+        exactResults += 1;
+      }
+    }
+
+    const total = finishedMatches.length;
+
+    this.calendarStats.set({
+      finishedMatches: total,
+      exactResults,
+      correctOutcomes,
+      exactResultsPercent: total > 0
+        ? Math.round((exactResults / total) * 100)
+        : 0,
+      correctOutcomesPercent: total > 0
+        ? Math.round((correctOutcomes / total) * 100)
+        : 0
+    });
+  }
+
+  private resultOutcome(homeGoals: number, awayGoals: number): '1' | 'X' | '2' {
+    if (homeGoals > awayGoals) {
+      return '1';
+    }
+
+    if (homeGoals < awayGoals) {
+      return '2';
+    }
+
+    return 'X';
+  }
+
+  async save(match: Match): Promise<void> {
+    this.successMessage.set('');
+    this.errorMessage.set('');
+
+    const draft = this.draft(match.id);
+    const homeGoals = Number(draft.home);
+    const awayGoals = Number(draft.away);
+
+    if (!Number.isInteger(homeGoals) || !Number.isInteger(awayGoals)) {
+      this.errorMessage.set('Inserisci un risultato valido.');
+      return;
+    }
+
+    if (homeGoals < 0 || awayGoals < 0 || homeGoals > 30 || awayGoals > 30) {
+      this.errorMessage.set('Il risultato deve essere tra 0 e 30.');
+      return;
+    }
+
+    if (this.locked(match)) {
+      this.errorMessage.set('Pronostico bloccato: mancano meno di 5 minuti o la partita non è più programmata.');
+      return;
+    }
+
+    this.savingMatchId.set(match.id);
+
+    try {
+      await this.predictions.savePrediction(match, homeGoals, awayGoals);
+      this.existingPredictionMatchIds[match.id] = true;
+      this.successMessage.set('Pronostico salvato correttamente.');
+    } catch (error) {
+      console.error('Errore salvataggio pronostico:', error);
+      this.errorMessage.set('Pronostico non salvato. Controlla le regole Firestore o il blocco partita.');
+    } finally {
+      this.savingMatchId.set(null);
+    }
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.auth.logout();
+      await this.router.navigateByUrl('/login');
+    } catch (error) {
+      console.error('Errore logout:', error);
+      this.errorMessage.set('Logout non riuscito. Riprova.');
+    }
+  }
+}
