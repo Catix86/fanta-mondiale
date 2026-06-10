@@ -54,6 +54,7 @@
             @for(team of prices; track team.teamName) {
             <button type="button" class="team-price-card" [class.selected]="isSelected(team.teamName)"
                 (click)="toggleTeam(team.teamName)">
+                <img class="team-flag" [src]="team.teamName | teamFlag" [alt]="team.teamName" loading="lazy">
                 <span>{{ team.teamName }}</span>
                 <strong>{{ team.price }} FC</strong>
             </button>
@@ -74,6 +75,7 @@
         <div class="owned-team-header">
             <div>
                 <h2>
+                    <img class="team-flag" [src]="team.teamName | teamFlag" [alt]="team.teamName" loading="lazy">
                     {{ team.teamName }}
                     @if(team.isCaptain) {
                     <span>Capitano</span>

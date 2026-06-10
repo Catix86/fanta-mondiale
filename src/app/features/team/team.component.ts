@@ -15,6 +15,7 @@ import {
     getFantaTeamPrice
 } from '../../core/constants/fantateam-prices';
 import { FANTATEAM_RULES } from '../../core/constants/fantateam-rules';
+import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
 
 interface TeamScoreView {
     teamName: string;
@@ -27,7 +28,7 @@ interface TeamScoreView {
 
 @Component({
     standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, TeamFlagPipe],
     templateUrl: './team.component.html',
     styleUrl: './team.component.scss'
 })

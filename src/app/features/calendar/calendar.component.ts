@@ -1,4 +1,14 @@
-import { Component, inject, signal, DestroyRef } from '@angular/core';
+
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  QueryList,
+  signal,
+  ViewChildren
+} from '@angular/core';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatchService } from '../../core/services/match.service';
@@ -21,8 +31,7 @@ import {
   calculatePotentialPredictionPoints,
   PotentialPredictionPoints
 } from '../../core/utils/dynamic-scoring';
-
-
+import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
 
 interface CalendarUser {
   uid: string;
@@ -46,11 +55,13 @@ interface CalendarStats {
 
 @Component({
   standalone: true,
-  imports: [AsyncPipe, DatePipe, FormsModule],
+  imports: [AsyncPipe, DatePipe, FormsModule, TeamFlagPipe],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.scss'
 })
-export class CalendarComponent {
+export class CalendarComponent implements AfterViewInit {
+  @ViewChildren('matchCard') private matchCards!: QueryList<ElementRef<HTMLElement>>;
+
   private matches = inject(MatchService);
   private predictions = inject(PredictionService);
   private auth = inject(AuthService);
@@ -81,6 +92,7 @@ export class CalendarComponent {
 
   private currentUserPredictions: Prediction[] = [];
   private currentMatches: Match[] = [];
+  private hasScrolledToNextMatch = false;
 
   constructor() {
     this.auth.firebaseUser$
@@ -118,6 +130,7 @@ export class CalendarComponent {
       .subscribe(matches => {
         this.currentMatches = matches;
         this.recalculateCalendarStats();
+        this.scrollToNextUpcomingMatchOnce();
       });
 
     collectionData(collection(this.firestore, 'users'), { idField: 'uid' })
@@ -137,6 +150,18 @@ export class CalendarComponent {
       .subscribe(predictions => {
         this.allPredictions = predictions;
       });
+  }
+
+  public ngAfterViewInit(): void {
+    this.matchCards.changes
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.scrollToNextUpcomingMatchOnce();
+      });
+
+    setTimeout(() => {
+      this.scrollToNextUpcomingMatchOnce();
+    });
   }
 
   hasExistingPrediction(matchId: string): boolean {
@@ -308,4 +333,44 @@ export class CalendarComponent {
     }
   }
 
+  private scrollToNextUpcomingMatchOnce(): void {
+    if (this.hasScrolledToNextMatch) {
+      return;
+    }
+
+    if (!this.currentMatches.length || !this.matchCards?.length) {
+      return;
+    }
+
+    const now = Date.now();
+
+    const sortedMatches = [...this.currentMatches].sort(
+      (a, b) => this.matchDate(a).getTime() - this.matchDate(b).getTime()
+    );
+
+    const nextMatch =
+      sortedMatches.find(match => this.matchDate(match).getTime() >= now) ??
+      sortedMatches[sortedMatches.length - 1];
+
+    if (!nextMatch) {
+      return;
+    }
+
+    const targetCard = this.matchCards.find(card =>
+      card.nativeElement.dataset['matchId'] === nextMatch.id
+    );
+
+    if (!targetCard) {
+      return;
+    }
+
+    this.hasScrolledToNextMatch = true;
+
+    setTimeout(() => {
+      targetCard.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 250);
+  }
 }

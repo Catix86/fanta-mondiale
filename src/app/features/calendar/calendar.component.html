@@ -18,12 +18,12 @@
         <div>
             <span class="muted">Esiti</span>
             <strong>{{ calendarStats().correctOutcomesPercent }}%</strong>
-            </div>
-            <div>
-                <span class="muted">Esatti</span>
-                <strong>{{ calendarStats().exactResultsPercent }}%</strong>
-            </div>
-            <div>
+        </div>
+        <div>
+            <span class="muted">Esatti</span>
+            <strong>{{ calendarStats().exactResultsPercent }}%</strong>
+        </div>
+        <div>
             <span class="muted">Vincente</span>
             <strong>{{ user.championPick }}</strong>
         </div>
@@ -52,16 +52,23 @@
     }
 
     @for(match of matches; track match.id) {
-    <section class="card match-card">
+    <section #matchCard class="card match-card" [attr.data-match-id]="match.id">
         <div class="match-topline">
             <strong>{{ match.group ? 'Gruppo ' + match.group : match.stage }}</strong>
             <span class="muted">{{ matchDate(match) | date:'dd MMMM ore HH:mm' }}</span>
         </div>
 
         <div class="teams-row">
-            <strong>{{ match.homeTeam }}</strong>
+            <div class="team-name-with-flag">
+                <img class="team-flag" [src]="match.homeTeam | teamFlag" [alt]="match.homeTeam" loading="lazy">
+                <strong>{{ match.homeTeam }}</strong>
+            </div>
+
             <span class="muted">vs</span>
-            <strong>{{ match.awayTeam }}</strong>
+<div class="team-name-with-flag">
+    <img class="team-flag" [src]="match.awayTeam | teamFlag" [alt]="match.awayTeam" loading="lazy">
+                <strong>{{ match.awayTeam }}</strong>
+            </div>
         </div>
 
         <div class="match-points-row">

@@ -38,7 +38,7 @@ export const FANTATEAM_PRICES: FantaTeamPrice[] = [
     { teamName: 'Canada', price: 9, tier: 4 },
     { teamName: 'Ecuador', price: 9, tier: 4 },
     { teamName: 'Norvegia', price: 8, tier: 4 },
-    { teamName: 'Costa d\'Avorio', price: 8, tier: 4 },
+    { teamName: 'Costa d’Avorio', price: 8, tier: 4 },
     { teamName: 'Paraguay', price: 8, tier: 4 },
     { teamName: 'Scozia', price: 8, tier: 4 },
     { teamName: 'Egitto', price: 8, tier: 4 },
