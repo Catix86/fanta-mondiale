@@ -54,7 +54,7 @@ export class RegisterComponent {
 
     try {
       await this.auth.register(value.username, value.password, value.championPick);
-      await this.router.navigateByUrl('/calendario');
+      await this.router.navigateByUrl('/dashboard');
     } catch (error: any) {
       console.error('Errore registrazione:', error);
       const code = error?.code;

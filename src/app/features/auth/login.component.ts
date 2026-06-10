@@ -28,7 +28,7 @@ export class LoginComponent {
     this.error.set('');
     try {
       await this.auth.login(this.form.controls.username.value, this.form.controls.password.value);
-      await this.router.navigateByUrl('/calendario');
+      await this.router.navigateByUrl('/dashboard');
     } catch (error: any) {
       console.error('Errore login:', error);
       this.error.set('Credenziali non valide.');
