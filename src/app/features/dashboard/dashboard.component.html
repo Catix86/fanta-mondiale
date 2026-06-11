@@ -1,15 +1,12 @@
 <header class="dashboard-header">
   @if(user$ | async; as user) {
   <div class="dashboard-user-row">
-    <div>
-      <p class="hello">Ciao, {{ user.username }}</p>
-      <h1>Fanta Mondiale 2026</h1>
-    </div>
-
+    <p class="hello">Ciao, {{ user.username }}</p>
     <button type="button" class="logout-button" (click)="logout()" aria-label="Esci">
       Logout
     </button>
   </div>
+  <h1>Fanta Mondiale 2026</h1>
   }
 </header>
 
@@ -25,14 +22,14 @@
   <section class="card dashboard-row">
     <span class="material-symbols-rounded">sports_soccer</span>
     <div class="user-info">
-      <h2>Esiti</h2>
+      <h2>Esiti corretti</h2>
     </div>
     <strong class="points">{{ calendarStats().correctOutcomesPercent }}%</strong>
   </section>
   <section class="card dashboard-row">
     <span class="material-symbols-rounded">scoreboard</span>
     <div class="user-info">
-      <h2>Esatti</h2>
+      <h2>Risultati esatti</h2>
     </div>
     <strong class="points">{{ calendarStats().exactResultsPercent }}%</strong>
   </section>

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   standalone: true,
@@ -12,4 +13,6 @@ import { AuthService } from '../../core/services/auth.service';
 export class MobileShellComponent {
   private auth = inject(AuthService);
   user$ = this.auth.appUser$;
+
+  toast = inject(ToastService).toast;
 }

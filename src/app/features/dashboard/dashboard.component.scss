@@ -19,13 +19,15 @@
     margin: 0;
     color: var(--accent);
     font-weight: 900;
-    font-size: 12px;
+    font-size: 16px;
+    padding: 8px 0px;
 }
 
 h1 {
-    margin: 2px 0 8px;
+    margin: 10px 0px 0px 0px;
     font-size: 28px;
     font-weight: 1000;
+    justify-self: center;
 }
 
 .dashboard-content {
@@ -37,7 +39,7 @@ h1 {
 
 .logout-button {
     flex-shrink: 0;
-    border: 1px solid var(--border);
+    border: 1px solid var(--accent);
     border-radius: 14px;
     padding: 8px 10px;
     background: rgba(255, 255, 255, .08);
@@ -73,6 +75,10 @@ h1 {
 
 .user-info {
     flex: 1;
+}
+
+.user-info h2 {
+    font-size: 18px;
 }
 
 .user-info p {

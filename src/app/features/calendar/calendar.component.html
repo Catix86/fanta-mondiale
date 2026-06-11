@@ -5,18 +5,6 @@
         </span>
         <span>Calendario</span>
     </h1>
-
-    @if(successMessage()) {
-    <section class="card success-card">
-        <p>{{ successMessage() }}</p>
-    </section>
-    }
-    @if(errorMessage()) {
-    <section class="card error-card">
-        <p>{{ errorMessage() }}</p>
-    </section>
-    }
-
     @if(matches$ | async; as matches) {
     @if(matches.length === 0) {
     <section class="card">
@@ -67,9 +55,11 @@
 
         @if(!locked(match)) {
         <div class="score-inputs">
-            <input class="input score-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).home">
+            <input class="input score-input" inputmode="numeric" min="0" max="10" [(ngModel)]="draft(match.id).home"
+                (focus)="selectInput($event)">
             <strong>-</strong>
-            <input class="input score-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).away">
+            <input class="input score-input" inputmode="numeric" min="0" max="10" [(ngModel)]="draft(match.id).away"
+                (focus)="selectInput($event)">
         </div>
 
         <button class="btn" [disabled]="savingMatchId() === match.id" (click)="save(match)">

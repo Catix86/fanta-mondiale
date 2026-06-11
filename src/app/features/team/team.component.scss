@@ -243,3 +243,136 @@ h2 {
         'GRAD' 0,
         'opsz' 32;
 }
+
+.rules-preview-card {
+    display: grid;
+    gap: 12px;
+}
+
+.rules-preview-card h2 {
+    margin: 0 0 6px;
+}
+
+.rules-preview-card p {
+    margin: 0;
+}
+
+.rules-open-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.rules-open-button .material-symbols-rounded {
+    font-size: 20px;
+}
+
+.rules-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    padding: 12px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: rgba(2, 6, 23, .72);
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+}
+
+.rules-modal {
+    width: 100%;
+    max-width: 480px;
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top));
+    overflow: auto;
+}
+
+.rules-modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: -16px -16px 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(15, 23, 42, .96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+}
+
+.rules-modal-header h2 {
+    margin: 2px 0 0;
+    font-size: 24px;
+    font-weight: 1000;
+}
+
+.rules-modal-close {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .08);
+    color: var(--text);
+}
+
+.rules-modal-close .material-symbols-rounded {
+    font-size: 22px;
+}
+
+.rules-modal-body {
+    display: grid;
+    gap: 0;
+}
+
+.rule-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.rule-row:first-child {
+    border-top: 0;
+}
+
+.rule-points {
+    min-width: 44px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    text-align: center;
+    font-weight: 1000;
+    font-size: 12px;
+}
+
+.rule-row strong {
+    display: block;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.rule-row p {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.positive {
+    background: rgba(52, 211, 153, .16);
+    color: var(--primary);
+}
+
+.negative {
+    background: rgba(251, 113, 133, .16);
+    color: #fb7185;
+}

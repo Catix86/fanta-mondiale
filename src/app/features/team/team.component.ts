@@ -46,12 +46,20 @@ export class TeamComponent {
     loading = signal(false);
     successMessage = signal('');
     errorMessage = signal('');
-
+    rulesModalOpen = signal(false);
     myTeam = signal<UserTeam | undefined>(undefined);
     teamEvents = signal<TeamEvent[]>([]);
 
     selectedTeams: string[] = [];
     selectedCaptain = '';
+
+    openRulesModal(): void {
+        this.rulesModalOpen.set(true);
+    }
+
+    closeRulesModal(): void {
+        this.rulesModalOpen.set(false);
+    }
 
     constructor() {
         this.auth.firebaseUser$
@@ -153,7 +161,7 @@ export class TeamComponent {
             return [];
         }
 
-        return team.teams.map(teamName => {
+        const result = team.teams.map(teamName => {
             const events = this.teamEvents().filter(event => event.teamName === teamName);
             const basePoints = events.reduce((total, event) => total + event.points, 0);
             const isCaptain = team.captainTeam === teamName;
@@ -167,6 +175,23 @@ export class TeamComponent {
                 events
             };
         });
+
+        // ordina le squadre, prima il capitano, poi per punti, poi per CF
+        const orderedResult = result.sort((a, b) => {
+            if (a.isCaptain && !b.isCaptain) {
+                return -1;
+            } else if (!a.isCaptain && b.isCaptain) {
+                return 1;
+            } else if (b.finalPoints !== a.finalPoints) {
+                return b.finalPoints - a.finalPoints;
+            } else if (b.price !== a.price) {
+                return b.price - a.price;
+            } else {
+                return a.teamName.localeCompare(b.teamName);
+            }
+        });
+
+        return orderedResult;
     }
 
     totalTeamPoints(): number {

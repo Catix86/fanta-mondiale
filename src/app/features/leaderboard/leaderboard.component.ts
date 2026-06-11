@@ -185,6 +185,23 @@ export class LeaderboardComponent {
     })
   );
 
+  getOrderedTeamScores(teamScores: TeamScoreView[]): TeamScoreView[] {
+    // ordina le squadre, prima il capitano, poi per punti, poi per CF
+    return [...teamScores].sort((a, b) => {
+      if (a.isCaptain && !b.isCaptain) {
+        return -1;
+      } else if (!a.isCaptain && b.isCaptain) {
+        return 1;
+      } else if (b.finalPoints !== a.finalPoints) {
+        return b.finalPoints - a.finalPoints;
+      } else if (b.price !== a.price) {
+        return b.price - a.price;
+      } else {
+        return a.teamName.localeCompare(b.teamName);
+      }
+    });    
+  }
+
   openUserSquad(user: LeaderboardRow, currentUserUid: string | undefined): void {
     if (!currentUserUid) {
       return;

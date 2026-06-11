@@ -22,6 +22,16 @@
       </a>
       }
     </div>
-    </nav>
+  </nav>
   }
+<div class="global-toast" [class.visible]="toast().visible" [class.success]="toast().type === 'success'"
+  [class.error]="toast().type === 'error'">
+
+  <span class="material-symbols-rounded icon">
+    @if(toast().type === 'success') { check_circle }
+    @else { error }
+  </span>
+
+  <span>{{ toast().message }}</span>
+</div>
 </div>

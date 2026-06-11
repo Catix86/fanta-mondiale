@@ -32,6 +32,7 @@ import {
   PotentialPredictionPoints
 } from '../../core/utils/dynamic-scoring';
 import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
+import { ToastService } from '../../core/services/toast.service';
 
 interface CalendarUser {
   uid: string;
@@ -68,6 +69,7 @@ export class CalendarComponent implements AfterViewInit {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private firestore = inject(Firestore);
+  private toast = inject(ToastService);
 
   matches$ = this.matches.getMatches();
   user$ = this.auth.appUser$;
@@ -287,25 +289,24 @@ export class CalendarComponent implements AfterViewInit {
   }
 
   async save(match: Match): Promise<void> {
-    this.successMessage.set('');
-    this.errorMessage.set('');
+    this.toast.show('');
 
     const draft = this.draft(match.id);
     const homeGoals = Number(draft.home);
     const awayGoals = Number(draft.away);
 
     if (!Number.isInteger(homeGoals) || !Number.isInteger(awayGoals)) {
-      this.errorMessage.set('Inserisci un risultato valido.');
+      this.toast.show('Inserisci un risultato valido.', 'error');
       return;
     }
 
-    if (homeGoals < 0 || awayGoals < 0 || homeGoals > 30 || awayGoals > 30) {
-      this.errorMessage.set('Il risultato deve essere tra 0 e 30.');
+    if (homeGoals < 0 || awayGoals < 0 || homeGoals > 10 || awayGoals > 10) {
+      this.toast.show('Il risultato deve essere tra 0 e 10.', 'error');
       return;
     }
 
     if (this.locked(match)) {
-      this.errorMessage.set('Pronostico bloccato: mancano meno di 5 minuti o la partita non è più programmata.');
+      this.toast.show('Pronostico bloccato: mancano meno di 5 minuti o la partita non è più programmata.', 'error');
       return;
     }
 
@@ -314,10 +315,10 @@ export class CalendarComponent implements AfterViewInit {
     try {
       await this.predictions.savePrediction(match, homeGoals, awayGoals);
       this.existingPredictionMatchIds[match.id] = true;
-      this.successMessage.set('Pronostico salvato correttamente.');
+      this.toast.show('Pronostico salvato correttamente');
     } catch (error) {
       console.error('Errore salvataggio pronostico:', error);
-      this.errorMessage.set('Pronostico non salvato. Controlla le regole Firestore o il blocco partita.');
+      this.toast.show('Errore nel salvataggio del pronostico', 'error');
     } finally {
       this.savingMatchId.set(null);
     }
@@ -372,5 +373,16 @@ export class CalendarComponent implements AfterViewInit {
         block: 'center'
       });
     }, 250);
+  }
+
+  selectInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input) return;
+
+    // piccolo timeout per mobile (importantissimo)
+    setTimeout(() => {
+      input.select();
+    });
   }
 }

@@ -19,6 +19,7 @@
     }
 
     @if(!myTeam()) {
+    <!-- CREAZIONE SQUADRA -->
     <section class="card">
         <h2>Crea il tuo team</h2>
 
@@ -52,6 +53,7 @@
         </button>
     </section>
 
+    <!-- MERCATO SQUADRE -->
     <section class="card">
         <h2>Mercato squadre</h2>
 
@@ -115,20 +117,49 @@
     }
     }
 
-    <section class="card">
-        <h2>Bonus/Malus possibili</h2>
-
-        @for(rule of rules; track rule.id) {
-        <div class="rule-row">
-            <span [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
-                {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
-            </span>
-
-            <div>
-                <strong>{{ rule.label }}</strong>
-                <p>{{ rule.description }}</p>
-            </div>
+    <!-- BONUS MALUS EXPLANATION -->
+    <section class="card rules-preview-card">
+        <div>
+            <h2>Bonus/Malus</h2>
+            <p class="muted">
+                Consulta tutti i bonus e malus disponibili per le squadre.
+            </p>
         </div>
-        }
+        <button type="button" class="btn secondary rules-open-button" (click)="openRulesModal()">
+            <span class="material-symbols-rounded">list_alt</span>
+            Vedi regole
+        </button>
     </section>
-</main>
+    </main>
+
+    @if(rulesModalOpen()) {
+    <div class="rules-modal-backdrop" (click)="closeRulesModal()">
+        <section class="card rules-modal" (click)="$event.stopPropagation()">
+            <div class="rules-modal-header">
+                <div>
+                    <span class="muted">Lista completa</span>
+                    <h2>Bonus/Malus</h2>
+                </div>
+
+                <button type="button" class="rules-modal-close" (click)="closeRulesModal()" aria-label="Chiudi">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+
+        <div class="rules-modal-body">
+            @for(rule of rules; track rule.id) {
+            <div class="rule-row">
+                <span class="rule-points" [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
+                    {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
+                </span>
+
+                <div>
+                    <strong>{{ rule.label }}</strong>
+                    <p>{{ rule.description }}</p>
+                </div>
+                </div>
+                }
+        </div>
+    </section>
+</div>
+}

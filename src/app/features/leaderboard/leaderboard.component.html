@@ -84,7 +84,7 @@
       </p>
       }
 
-      @for(team of selectedUser.teamScores; track team.teamName) {
+      @for(team of getOrderedTeamScores(selectedUser.teamScores); track team.teamName) {
       <article class="opponent-team-card" [class.captain]="team.isCaptain">
         <div class="opponent-team-header">
           <div class="opponent-team-title">
