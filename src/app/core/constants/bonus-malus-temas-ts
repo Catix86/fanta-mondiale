@@ -1,0 +1,29 @@
+// Elenco delle squadre per il bonus/malus del fantateam
+export const FANTATEAM_BONUS_MALUS: string[] = [
+    'Spagna',
+    'Belgio',
+    'Stati Uniti',
+    'Senegal',
+    'Svizzera',
+    'Qatar',
+    'Paesi Bassi',
+    'Croazia',
+    'Marocco',
+    'Giappone',
+    'Corea del Sud',
+    'Uruguay',
+    'Paraguay',
+    'Tunisia',
+    'Germania',
+    'Ecuador',
+    'Egitto',
+    'Portogallo',
+    'Svezia',
+    'Turchia',
+    'Norvegia',
+    'Argentina',
+    'Austria',
+    'Messico',
+    'Panama'
+];
+

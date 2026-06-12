@@ -76,4 +76,16 @@ export class MatchService {
       status: 'finished'
     });
   }
+
+  getResultOutcome(homeGoals: number, awayGoals: number): '1' | 'X' | '2' {
+    if (homeGoals > awayGoals) {
+      return '1';
+    }
+
+    if (homeGoals < awayGoals) {
+      return '2';
+    }
+
+    return 'X';
+  }
 }

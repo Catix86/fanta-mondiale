@@ -63,16 +63,16 @@ interface CalendarStats {
 export class CalendarComponent implements AfterViewInit {
   @ViewChildren('matchCard') private matchCards!: QueryList<ElementRef<HTMLElement>>;
 
-  private matches = inject(MatchService);
-  private predictions = inject(PredictionService);
-  private auth = inject(AuthService);
+  private matchService = inject(MatchService);
+  private predictionService = inject(PredictionService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private firestore = inject(Firestore);
   private toast = inject(ToastService);
 
-  matches$ = this.matches.getMatches();
-  user$ = this.auth.appUser$;
+  matches$ = this.matchService.getMatches();
+  user$ = this.authService.appUser$;
 
   savingMatchId = signal<string | null>(null);
   successMessage = signal('');
@@ -97,14 +97,14 @@ export class CalendarComponent implements AfterViewInit {
   private hasScrolledToNextMatch = false;
 
   constructor() {
-    this.auth.firebaseUser$
+    this.authService.firebaseUser$
       .pipe(
         switchMap(user => {
           if (!user) {
             return of([]);
           }
 
-          return this.predictions.getUserPredictions(user.uid);
+          return this.predictionService.getUserPredictions(user.uid);
         }),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -147,7 +147,7 @@ export class CalendarComponent implements AfterViewInit {
         this.usersMap = map;
       });
 
-    this.predictions.getAllPredictions()
+    this.predictionService.getAllPredictions()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(predictions => {
         this.allPredictions = predictions;
@@ -238,12 +238,12 @@ export class CalendarComponent implements AfterViewInit {
         continue;
       }
 
-      const officialOutcome = this.resultOutcome(
+      const officialOutcome = this.matchService.getResultOutcome(
         match.officialHomeGoals!,
         match.officialAwayGoals!
       );
 
-      const predictedOutcome = this.resultOutcome(
+      const predictedOutcome = this.matchService.getResultOutcome(
         prediction.predictedHomeGoals,
         prediction.predictedAwayGoals
       );
@@ -276,18 +276,6 @@ export class CalendarComponent implements AfterViewInit {
     });
   }
 
-  private resultOutcome(homeGoals: number, awayGoals: number): '1' | 'X' | '2' {
-    if (homeGoals > awayGoals) {
-      return '1';
-    }
-
-    if (homeGoals < awayGoals) {
-      return '2';
-    }
-
-    return 'X';
-  }
-
   async save(match: Match): Promise<void> {
     this.toast.show('');
 
@@ -313,7 +301,7 @@ export class CalendarComponent implements AfterViewInit {
     this.savingMatchId.set(match.id);
 
     try {
-      await this.predictions.savePrediction(match, homeGoals, awayGoals);
+      await this.predictionService.savePrediction(match, homeGoals, awayGoals);
       this.existingPredictionMatchIds[match.id] = true;
       this.toast.show('Pronostico salvato correttamente');
     } catch (error) {
@@ -326,7 +314,7 @@ export class CalendarComponent implements AfterViewInit {
 
   async logout(): Promise<void> {
     try {
-      await this.auth.logout();
+      await this.authService.logout();
       await this.router.navigateByUrl('/login');
     } catch (error) {
       console.error('Errore logout:', error);

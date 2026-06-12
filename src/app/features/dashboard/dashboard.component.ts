@@ -1,56 +1,29 @@
 
 import {
   Component,
-  DestroyRef,
-  ElementRef,
   inject,
-  QueryList,
+  OnInit,
   signal,
-  ViewChildren
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatchService } from '../../core/services/match.service';
-import { PredictionService } from '../../core/services/prediction.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Match } from '../../core/models/match.model';
-import { isPredictionLocked } from '../../core/utils/scoring';
 import { Router } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { switchMap, of } from 'rxjs';
+import { Observable, map, combineLatest } from 'rxjs';
 import {
   Firestore,
   collection,
   collectionData
 } from '@angular/fire/firestore';
 import { Prediction } from '../../core/models/prediction.model';
-import {
-  getMatchOutcomePoints,
-  MatchOutcomePoints,
-  calculatePotentialPredictionPoints,
-  PotentialPredictionPoints
-} from '../../core/utils/dynamic-scoring';
 import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
-
-interface CalendarUser {
-  uid: string;
-  username: string;
-}
-
-interface MatchPredictionView {
-  uid: string;
-  username: string;
-  predictedHomeGoals: number;
-  predictedAwayGoals: number;
-}
-
-interface CalendarStats {
-  finishedMatches: number;
-  exactResults: number;
-  correctOutcomes: number;
-  exactResultsPercent: number;
-  correctOutcomesPercent: number;
-}
+import { Stats } from '../../core/models/dashboard.model';
+import { LeaderboardRow, TeamScoreView } from '../../core/models/leaderboard.model';
+import { calculatePredictionScore, getChampionWinnerPoints } from '../../core/utils/dynamic-scoring';
+import { TeamEvent } from '../../core/models/team-event.model';
+import { UserTeam } from '../../core/models/user-team.model';
+import { getFantaTeamPrice } from '../../core/constants/fantateam-prices';
 
 @Component({
   standalone: true,
@@ -58,263 +31,202 @@ interface CalendarStats {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
-  @ViewChildren('matchCard') private matchCards!: QueryList<ElementRef<HTMLElement>>;
+export class DashboardComponent implements OnInit {
+  public errorMessage = signal('');
+  public stats = signal<Stats[]>([]);
 
-  private matches = inject(MatchService);
-  private predictions = inject(PredictionService);
-  private auth = inject(AuthService);
+  private authService = inject(AuthService);
   private router = inject(Router);
-  private destroyRef = inject(DestroyRef);
   private firestore = inject(Firestore);
 
-  matches$ = this.matches.getMatches();
-  user$ = this.auth.appUser$;
+  public user$ = this.authService.appUser$;
 
-  savingMatchId = signal<string | null>(null);
-  successMessage = signal('');
-  errorMessage = signal('');
+  private matches$ = collectionData(
+    collection(this.firestore, 'matches'),
+    { idField: 'id' }
+  ) as Observable<Match[]>;
 
-  allPredictions: Prediction[] = [];
-  usersMap: Record<string, string> = {};
+  private predictions$ = collectionData(
+    collection(this.firestore, 'predictions')
+  ) as Observable<Prediction[]>;
 
-  drafts: Record<string, { home: number; away: number }> = {};
-  existingPredictionMatchIds: Record<string, boolean> = {};
+  private userTeams$ = collectionData(
+    collection(this.firestore, 'userTeams')
+  ) as Observable<UserTeam[]>;
 
-  calendarStats = signal<CalendarStats>({
-    finishedMatches: 0,
-    exactResults: 0,
-    correctOutcomes: 0,
-    exactResultsPercent: 0,
-    correctOutcomesPercent: 0
-  });
+  private teamEvents$ = collectionData(
+    collection(this.firestore, 'teamEvents'),
+    { idField: 'id' }
+  ) as Observable<TeamEvent[]>;
 
-  private currentUserPredictions: Prediction[] = [];
-  private currentMatches: Match[] = [];
-
-  constructor() {
-    this.auth.firebaseUser$
-      .pipe(
-        switchMap(user => {
-          if (!user) {
-            return of([]);
-          }
-
-          return this.predictions.getUserPredictions(user.uid);
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-
-      .subscribe(predictions => {
-        const existing: Record<string, boolean> = {};
-        this.currentUserPredictions = predictions;
-
-        for (const prediction of predictions) {
-          this.drafts[prediction.matchId] = {
-            home: prediction.predictedHomeGoals,
-            away: prediction.predictedAwayGoals
-          };
-
-          existing[prediction.matchId] = true;
+  public ngOnInit(): void {
+    this.getUserStat().subscribe(stat => {
+      console.log('User stat:', stat);
+      this.stats.set([
+        {
+          icon: 'leaderboard',
+          title: 'Punti',
+          value: stat.points.toString()
+        },
+        {
+          icon: 'sports_soccer',
+          title: 'Risultati esatti',
+          value: stat.exactResults.toString()
+        },
+        {
+          icon: 'scoreboard',
+          title: 'Esiti corretti',
+          value: stat.correctOutcomes.toString()
+        },
+        {
+          icon: 'trophy',
+          title: 'Vincente',
+          value: ''
         }
-
-        this.recalculateCalendarStats();
-        this.existingPredictionMatchIds = existing;
-      });
-
-
-    this.matches$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(matches => {
-        this.currentMatches = matches;
-        this.recalculateCalendarStats();
-      });
-
-    collectionData(collection(this.firestore, 'users'), { idField: 'uid' })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(users => {
-        const map: Record<string, string> = {};
-
-        for (const user of users as CalendarUser[]) {
-          map[user.uid] = user.username;
-        }
-
-        this.usersMap = map;
-      });
-
-    this.predictions.getAllPredictions()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(predictions => {
-        this.allPredictions = predictions;
-      });
-  }
-
-  hasExistingPrediction(matchId: string): boolean {
-    return Boolean(this.existingPredictionMatchIds[matchId]);
-  }
-
-  outcomePoints(match: Match): MatchOutcomePoints {
-    return getMatchOutcomePoints(match);
-  }
-
-  potentialPredictionPoints(match: Match): PotentialPredictionPoints {
-    const draft = this.draft(match.id);
-
-    return calculatePotentialPredictionPoints(
-      match,
-      Number(draft.home),
-      Number(draft.away)
-    );
-  }
-
-  draft(matchId: string): { home: number; away: number } {
-    if (!this.drafts[matchId]) this.drafts[matchId] = { home: 0, away: 0 };
-    return this.drafts[matchId];
-  }
-
-  matchDate(match: Match): Date {
-    const kickoffAt: any = match.kickoffAt;
-
-    if (kickoffAt?.toDate) {
-      return kickoffAt.toDate();
-    }
-
-    return new Date(kickoffAt);
-  }
-
-  locked(match: Match): boolean {
-    return isPredictionLocked(this.matchDate(match)) || match.status !== 'scheduled';
-  }
-
-  matchPredictions(matchId: string): MatchPredictionView[] {
-    return this.allPredictions
-      .filter(prediction => prediction.matchId === matchId)
-      .map(prediction => ({
-        uid: prediction.uid,
-        username: this.usersMap[prediction.uid] || 'Utente',
-        predictedHomeGoals: prediction.predictedHomeGoals,
-        predictedAwayGoals: prediction.predictedAwayGoals
-      }))
-      .sort((a, b) => a.username.localeCompare(b.username));
-  }
-
-  private recalculateCalendarStats(): void {
-    const finishedMatches = this.currentMatches.filter(match =>
-      match.status === 'finished' &&
-      typeof match.officialHomeGoals === 'number' &&
-      typeof match.officialAwayGoals === 'number'
-    );
-
-    const predictionsByMatchId = new Map<string, Prediction>();
-
-    for (const prediction of this.currentUserPredictions) {
-      predictionsByMatchId.set(prediction.matchId, prediction);
-    }
-
-    let exactResults = 0;
-    let correctOutcomes = 0;
-
-    for (const match of finishedMatches) {
-      const prediction = predictionsByMatchId.get(match.id);
-
-      if (!prediction) {
-        continue;
-      }
-
-      const officialOutcome = this.resultOutcome(
-        match.officialHomeGoals!,
-        match.officialAwayGoals!
-      );
-
-      const predictedOutcome = this.resultOutcome(
-        prediction.predictedHomeGoals,
-        prediction.predictedAwayGoals
-      );
-
-      const exact =
-        prediction.predictedHomeGoals === match.officialHomeGoals &&
-        prediction.predictedAwayGoals === match.officialAwayGoals;
-
-      if (predictedOutcome === officialOutcome) {
-        correctOutcomes += 1;
-      }
-
-      if (exact) {
-        exactResults += 1;
-      }
-    }
-
-    const total = finishedMatches.length;
-
-    this.calendarStats.set({
-      finishedMatches: total,
-      exactResults,
-      correctOutcomes,
-      exactResultsPercent: total > 0
-        ? Math.round((exactResults / total) * 100)
-        : 0,
-      correctOutcomesPercent: total > 0
-        ? Math.round((correctOutcomes / total) * 100)
-        : 0
+      ]);
     });
   }
 
-  private resultOutcome(homeGoals: number, awayGoals: number): '1' | 'X' | '2' {
-    if (homeGoals > awayGoals) {
-      return '1';
-    }
+  private getUserStat(): Observable<LeaderboardRow> {
+    return combineLatest([
+      this.user$,
+      this.matches$,
+      this.predictions$,
+      this.userTeams$,
+      this.teamEvents$
+    ]).pipe(
+      map(([user, matches, predictions, userTeams, teamEvents]) => {
+        const matchesMap = new Map<string, Match>();
 
-    if (homeGoals < awayGoals) {
-      return '2';
-    }
+        for (const match of matches) {
+          matchesMap.set(match.id, match);
+        }
 
-    return 'X';
-  }
+        let predictionPoints = 0;
+        let exactResults = 0;
+        let correctOutcomes = 0;
 
-  async save(match: Match): Promise<void> {
-    this.successMessage.set('');
-    this.errorMessage.set('');
+        const userPredictions = predictions.filter((p: Prediction) => p.uid === user?.uid);
 
-    const draft = this.draft(match.id);
-    const homeGoals = Number(draft.home);
-    const awayGoals = Number(draft.away);
+        for (const prediction of userPredictions) {
+          const match = matchesMap.get(prediction.matchId);
 
-    if (!Number.isInteger(homeGoals) || !Number.isInteger(awayGoals)) {
-      this.errorMessage.set('Inserisci un risultato valido.');
-      return;
-    }
+          if (!match) {
+            continue;
+          }
 
-    if (homeGoals < 0 || awayGoals < 0 || homeGoals > 30 || awayGoals > 30) {
-      this.errorMessage.set('Il risultato deve essere tra 0 e 30.');
-      return;
-    }
+          const score = calculatePredictionScore(match, prediction);
 
-    if (this.locked(match)) {
-      this.errorMessage.set('Pronostico bloccato: mancano meno di 5 minuti o la partita non è più programmata.');
-      return;
-    }
+          predictionPoints += score.points;
 
-    this.savingMatchId.set(match.id);
+          if (score.exactResult) {
+            exactResults += 1;
+          }
 
-    try {
-      await this.predictions.savePrediction(match, homeGoals, awayGoals);
-      this.existingPredictionMatchIds[match.id] = true;
-      this.successMessage.set('Pronostico salvato correttamente.');
-    } catch (error) {
-      console.error('Errore salvataggio pronostico:', error);
-      this.errorMessage.set('Pronostico non salvato. Controlla le regole Firestore o il blocco partita.');
-    } finally {
-      this.savingMatchId.set(null);
-    }
+          if (score.correctOutcome) {
+            correctOutcomes += 1;
+          }
+        }
+
+        const userTeam = userTeams.find((team: UserTeam) => team.uid === user?.uid);
+
+        const teamScores = this.buildTeamScores(
+          userTeam,
+          teamEvents,
+          matchesMap
+        );
+
+        const squadPoints = teamScores.reduce(
+          (total: number, team: TeamScoreView) => total + team.finalPoints,
+          0
+        );
+
+        const uid = user?.uid ?? '';
+        const username = user?.username ?? '';
+        const championPick = user?.championPick ?? '';
+        const championBonus = user?.championBonusAwarded ? true : false;
+        const championWinnerPoints = championBonus ? getChampionWinnerPoints(championPick) : 0;
+
+        const totalPoints =
+          predictionPoints +
+          squadPoints +
+          championWinnerPoints;
+
+        return {
+          uid,
+          username,
+          championPick,
+          points: totalPoints,
+          predictionPoints,
+          squadPoints,
+          exactResults,
+          correctOutcomes,
+          championBonus,
+          teamScores
+        };
+      })
+    );
   }
 
   async logout(): Promise<void> {
     try {
-      await this.auth.logout();
+      await this.authService.logout();
       await this.router.navigateByUrl('/login');
     } catch (error) {
       console.error('Errore logout:', error);
       this.errorMessage.set('Logout non riuscito. Riprova.');
     }
+  }
+
+  private buildTeamScores(
+    userTeam: UserTeam | undefined,
+    teamEvents: TeamEvent[],
+    matchesMap: Map<string, Match>
+  ): TeamScoreView[] {
+    if (!userTeam) {
+      return [];
+    }
+
+    return userTeam.teams.map(teamName => {
+      const isCaptain = userTeam.captainTeam === teamName;
+
+      const events = teamEvents
+        .filter(event => event.teamName === teamName)
+        .map(event => {
+          const match = matchesMap.get(event.matchId);
+
+          const matchLabel = match
+            ? `${match.homeTeam} - ${match.awayTeam}`
+            : 'Partita non trovata';
+
+          const computedPoints = isCaptain
+            ? event.points * 2
+            : event.points;
+
+          return {
+            ...event,
+            matchLabel,
+            computedPoints
+          };
+        });
+
+      const basePoints = events.reduce(
+        (total, event) => total + event.points,
+        0
+      );
+
+      const finalPoints = isCaptain
+        ? basePoints * 2
+        : basePoints;
+
+      return {
+        teamName,
+        price: getFantaTeamPrice(teamName),
+        isCaptain,
+        basePoints,
+        finalPoints,
+        events
+      };
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { AsyncPipe, DatePipe } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { MatchService } from '../../core/services/match.service';
@@ -11,7 +11,7 @@ import { FANTATEAM_RULES } from '../../core/constants/fantateam-rules';
 
 @Component({
   standalone: true,
-  imports: [AsyncPipe, DatePipe, FormsModule, ReactiveFormsModule],
+  imports: [AsyncPipe, DatePipe, FormsModule, NgClass, ReactiveFormsModule],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
 })

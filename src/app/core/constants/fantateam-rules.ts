@@ -85,6 +85,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'La squadra colpisce almeno un palo o una traversa.'
     },
     {
+        id: 'freekick',
+        category: 'pop',
+        points: 10,
+        label: 'Gol su calcio di punizione',
+        description: 'La squadra segna un gol direttamente da calcio di punizione.'
+    },
+    {
         id: 'invasione-campo',
         category: 'pop',
         points: 30,
@@ -160,6 +167,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         points: -3,
         label: 'Cattiva condotta',
         description: 'Un giocatore della squadra prende un cartellino rosso diretto.'
+    },
+    {
+        id: 'cagata-difensiva',
+        category: 'malus',
+        points: -5,
+        label: 'Cagata difensiva',
+        description: 'Un giocatore della squadra commette un errore che porta alla realizzazione di un gol avversario.'
     },
     {
         id: 'nervi-tesi',

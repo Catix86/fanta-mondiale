@@ -20,43 +20,7 @@ import {
 } from '../../core/utils/dynamic-scoring';
 import { getFantaTeamPrice } from '../../core/constants/fantateam-prices';
 import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
-
-interface AppUserRow {
-  uid: string;
-  username: string;
-  championPick: string;
-}
-
-interface WorldCupSettings {
-  winner?: string;
-}
-
-interface TeamEventView extends TeamEvent {
-  matchLabel: string;
-  computedPoints: number;
-}
-
-interface TeamScoreView {
-  teamName: string;
-  price: number;
-  isCaptain: boolean;
-  basePoints: number;
-  finalPoints: number;
-  events: TeamEventView[];
-}
-
-interface LeaderboardRow {
-  uid: string;
-  username: string;
-  championPick: string;
-  points: number;
-  predictionPoints: number;
-  squadPoints: number;
-  exactResults: number;
-  correctOutcomes: number;
-  championBonus: boolean;
-  teamScores: TeamScoreView[];
-}
+import { AppUserRow, LeaderboardRow, TeamScoreView, WorldCupSettings } from '../../core/models/leaderboard.model';
 
 @Component({
   standalone: true,
@@ -136,7 +100,9 @@ export class LeaderboardComponent {
 
             if (score.exactResult) {
               exactResults += 1;
-            } else if (score.correctOutcome) {
+            }
+            
+            if (score.correctOutcome) {
               correctOutcomes += 1;
             }
           }

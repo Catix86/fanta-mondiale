@@ -149,7 +149,13 @@
   <section class="card match-admin-card">
     <div class="match-admin-topline">
       <strong>{{ match.homeTeam }} - {{ match.awayTeam }}</strong>
-      <span>{{ statusLabel(match.status) }}</span>
+      <span class="status-badge" [ngClass]="{
+          'status-scheduled': match.status === 'scheduled',
+          'status-live': match.status === 'live',
+          'status-finished': match.status === 'finished'
+        }">
+        {{ statusLabel(match.status) }}
+      </span>
     </div>
 
     <p class="muted match-date">{{ matchDate(match) | date:'dd MMM HH:mm' }}</p>
