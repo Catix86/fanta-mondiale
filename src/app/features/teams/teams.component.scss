@@ -1,0 +1,260 @@
+.teams-content {
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.teams-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 30px;
+    line-height: 1;
+    margin: 8px 0;
+    font-weight: 1000;
+}
+
+.teams-title .material-symbols-rounded {
+    font-size: 1em;
+    line-height: 1;
+    width: 1em;
+    height: 1em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 700,
+        'GRAD' 0,
+        'opsz' 32;
+}
+
+.teams-summary-card {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 10px;
+}
+
+.teams-summary-card>div {
+    min-width: 0;
+    padding: 8px 6px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .06);
+    text-align: center;
+}
+
+.teams-summary-card span {
+    display: block;
+    font-size: 10px;
+    line-height: 1;
+    margin-bottom: 5px;
+    white-space: nowrap;
+}
+
+.teams-summary-card strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.1;
+    font-weight: 1000;
+}
+
+.team-score-card {
+    display: grid;
+    gap: 12px;
+}
+
+.team-score-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.team-score-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.team-rank {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, .08);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 1000;
+}
+
+.team-flag {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .08);
+}
+
+.team-score-title h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 1000;
+    line-height: 1.1;
+}
+
+.team-score-title p {
+    margin: 3px 0 0;
+    font-size: 11px;
+}
+
+.team-total-points {
+    flex-shrink: 0;
+    font-size: 20px;
+    font-weight: 1000;
+    white-space: nowrap;
+}
+
+.team-points-breakdown {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.team-points-breakdown span {
+    padding: 8px 10px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .06);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.no-events {
+    margin: 0;
+    font-size: 12px;
+}
+
+.team-event-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.team-event-row strong {
+    display: block;
+    font-size: 13px;
+}
+
+.team-event-row p {
+    margin: 2px 0;
+    font-size: 11px;
+}
+
+.team-event-row small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.team-event-row>span {
+    flex-shrink: 0;
+    min-width: 42px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    text-align: center;
+    font-weight: 1000;
+    font-size: 12px;
+}
+
+.positive,
+.positive-text {
+    color: var(--primary);
+}
+
+.positive {
+    background: rgba(52, 211, 153, .16);
+}
+
+.negative,
+.negative-text {
+    color: #fb7185;
+}
+
+.negative {
+    background: rgba(251, 113, 133, .16);
+}
+
+.team-events-box {
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .08);
+    overflow: hidden;
+}
+
+.team-events-box summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.team-events-box summary::-webkit-details-marker {
+    display: none;
+}
+
+.team-events-box summary>div {
+    min-width: 0;
+}
+
+.team-events-box summary strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 1000;
+}
+
+.team-events-box summary span.muted {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+}
+
+.expand-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+    transition: transform .2s ease;
+}
+
+.team-events-box[open] .expand-icon {
+    transform: rotate(180deg);
+}
+
+.team-events-content {
+    padding: 0 12px 12px;
+    display: grid;
+    gap: 0;
+}
+
+.team-events-box[open] {
+    background: rgba(255, 255, 255, .07);
+    border-color: rgba(255, 255, 255, .14);
+}
+
+.no-events {
+    margin: 0;
+    padding: 10px 0 0;
+    font-size: 12px;
+}

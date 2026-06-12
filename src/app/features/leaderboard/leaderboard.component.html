@@ -15,38 +15,85 @@
   }
 
   @for(user of leaderboard; track user.uid; let i = $index) {
-  <section class="card leaderboard-row" [class.first]="user.uid === currentUser.uid"
+  <section class="card leaderboard-card" [class.current-user]="user.uid === currentUser.uid"
     [class.clickable]="user.uid !== currentUser.uid" (click)="openUserSquad(user, currentUser.uid)">
-    <div class="rank">{{ i + 1 }}</div>
+    <div class="leaderboard-card-header">
+      <div class="leaderboard-user-block">
+        <div class="rank">
+          {{ i + 1 }}
+        </div>
 
-    <div class="user-info">
-      <strong>{{ user.username }} </strong>
+        <div class="leaderboard-user-main">
+          <strong class="leaderboard-username">
+            {{ cleanUsername(user.username) }}
+          </strong>
 
-      <p class="leaderboard-details">
-        <span>{{ user.exactResults }} risultati esatti</span>
-        <span>{{ user.correctOutcomes }} esiti corretti</span>
-        <span>Pronostici: {{ user.predictionPoints }} pt</span>
-        <span>Squadra: {{ user.squadPoints }} pt</span>
+          @if(user.uid === currentUser.uid) {
+          <span class="current-user-badge">
+            Tu
+          </span>
+          }
+          @if(user.uid !== currentUser.uid && hasSquad(user)) {
+          <small class="open-squad-hint">
+            Guarda la squadra di {{ cleanUsername(user.username) }}
+            </small>
+            } @else if(!hasSquad(user)) {
+            <small class="open-no-squad-hint">
+              <span class="material-symbols-rounded warning-icon">
+                warning
+              </span>
+            <span class="warning-text">
+              {{ cleanUsername(user.username) }} non ha ancora creato la squadra
+            </span>
+            </small>
+            }
+        </div>
+        </div>
 
-        @if(user.championBonus) {
-        · Bonus campione
-        }
-      </p>
-      @if(user.uid !== currentUser.uid && hasSquad(user)) {
-      <small class="open-squad-hint">
-        Guarda la squadra di {{ user.username }}
-      </small>
-      } @else if(!hasSquad(user)) {
-      <small class="open-no-squad-hint">
-        <span class="material-symbols-rounded warning-icon">
-          warning
-        </span>
-        <span class="warning-text">{{ user.username }} non ha ancora creato la squadra</span>
-      </small>
-      }
+        <strong class="points">
+          {{ user.points }}
+          <span>pt</span>
+        </strong>
     </div>
 
-    <strong class="points">{{ user.points }}</strong>
+    <details class="leaderboard-score-details" (click)="$event.stopPropagation()">
+      <summary>
+        <div>
+          <strong>Dettaglio punteggio</strong>
+        </div>
+
+        <span class="material-symbols-rounded expand-icon">
+          expand_more
+        </span>
+      </summary>
+
+      <div class="leaderboard-score-content">
+        <div class="score-detail-row">
+          <span>Risultati esatti</span>
+          <strong>{{ user.exactResults }}</strong>
+        </div>
+
+        <div class="score-detail-row">
+          <span>Esiti corretti</span>
+          <strong>{{ user.correctOutcomes }}</strong>
+        </div>
+
+        <div class="score-detail-row">
+          <span>Punti da pronostici</span>
+          <strong>{{ user.predictionPoints }} pt</strong>
+        </div>
+
+        <div class="score-detail-row">
+          <span>Punti della squadra</span>
+          <strong>{{ user.squadPoints }} pt</strong>
+        </div>
+
+        <div class="score-detail-row">
+          <span>Vincente Mondiale</span>
+          <strong class="winner">{{ user.championPick || 'Non assegnato' }}</strong>
+        </div>
+      </div>
+    </details>
     </section>
     }
   }
@@ -59,7 +106,7 @@
       <div class="squad-modal-header">
         <div>
           <span class="muted">Squadra di</span>
-          <h2>{{ selectedUser.username }}</h2>
+          <h2>{{ cleanUsername(selectedUser.username) }}</h2>
         </div>
 
         <button type="button" class="squad-modal-close" (click)="closeUserSquad()" aria-label="Chiudi">

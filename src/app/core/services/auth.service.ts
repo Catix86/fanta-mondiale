@@ -70,4 +70,15 @@ export class AuthService {
   logout(): Promise<void> {
     return signOut(this.auth);
   }
+
+  cleanUsername(username: string): string {
+    // Cerca se è presente la @ e rimuove tutto ciò che viene dopo
+    const atIndex = username.indexOf('@');
+
+    if (atIndex !== -1) {
+      return username.substring(0, atIndex);
+    }
+
+    return username;
+  }
 }

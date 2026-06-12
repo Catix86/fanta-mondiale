@@ -3,7 +3,7 @@
 
   @if(user$ | async; as user) {
   <nav class="bottom-nav">
-    <div class="bottom-nav-inner" [class.cols-5]="user.role === 'admin'" [class.cols-4]="user.role !== 'admin'">
+    <div class="bottom-nav-inner" [class.cols-6]="user.role === 'admin'" [class.cols-5]="user.role !== 'admin'">
       <a routerLink="/dashboard" routerLinkActive="active" class="nav-btn" aria-label="Dashboard">
         <span class="material-symbols-rounded">dashboard</span>
       </a>
@@ -16,6 +16,9 @@
       <a routerLink="/classifica" routerLinkActive="active" class="nav-btn" aria-label="Classifica">
         <span class="material-symbols-rounded">leaderboard</span>
       </a>
+      <a routerLink="/teams" routerLinkActive="active" class="nav-btn" aria-label="Teams">
+        <span class="material-symbols-rounded">emoji_flags</span>
+      </a>
       @if(user.role === 'admin') {
       <a routerLink="/admin" routerLinkActive="active" class="nav-btn" aria-label="Admin">
         <span class="material-symbols-rounded">admin_panel_settings</span>
@@ -24,14 +27,14 @@
     </div>
   </nav>
   }
-<div class="global-toast" [class.visible]="toast().visible" [class.success]="toast().type === 'success'"
-  [class.error]="toast().type === 'error'">
+  <div class="global-toast" [class.visible]="toast().visible" [class.success]="toast().type === 'success'"
+    [class.error]="toast().type === 'error'">
 
-  <span class="material-symbols-rounded icon">
-    @if(toast().type === 'success') { check_circle }
-    @else { error }
-  </span>
+    <span class="material-symbols-rounded icon">
+      @if(toast().type === 'success') { check_circle }
+      @else { error }
+    </span>
 
-  <span>{{ toast().message }}</span>
-</div>
+    <span>{{ toast().message }}</span>
+    </div>
 </div>

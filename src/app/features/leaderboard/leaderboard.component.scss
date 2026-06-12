@@ -10,6 +10,10 @@ h1 {
     font-weight: 1000;
 }
 
+.card {
+    padding: 9px;
+}
+
 .card>p {
     margin: 0;
 }
@@ -329,4 +333,240 @@ h1 {
 .leaderboard-details span {
     display: block;
     line-height: 1.25;
+}
+
+.leaderboard-card {
+    display: grid;
+    gap: 10px;
+}
+
+.leaderboard-card.current-user {
+    background-color: #d1bf8344;
+    border-color: var(--accent);
+}
+
+.leaderboard-card.clickable {
+    cursor: pointer;
+}
+
+.leaderboard-card.clickable:active {
+    transform: scale(.99);
+}
+
+.leaderboard-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.leaderboard-user-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.rank {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 15px;
+    background: #020617;
+    color: var(--accent);
+    display: grid;
+    place-items: center;
+    font-weight: 1000;
+    font-size: 24px;
+}
+
+.leaderboard-user-main {
+    min-width: 0;
+}
+
+.leaderboard-username {
+    display: inline-block;
+    max-width: 100%;
+    font-size: 20px;
+    font-weight: 1000;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.current-user-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #020617;
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 1000;
+    vertical-align: middle;
+}
+
+.points {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 36px;
+    line-height: .9;
+    font-weight: 1000;
+    white-space: nowrap;
+}
+
+.points span {
+    margin-top: 3px;
+    font-size: 11px;
+    font-weight: 900;
+    opacity: .72;
+    margin-right: 2px;
+}
+
+.open-squad-hint,
+.open-no-squad-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.open-squad-hint {
+    color: var(--accent);
+}
+
+.leaderboard-card.current-user .open-squad-hint {
+    color: #020617;
+}
+
+.open-no-squad-hint {
+    color: var(--muted);
+}
+
+.warning-icon {
+    font-size: 15px;
+    vertical-align: middle;
+}
+
+.warning-text {
+    padding-left: 4px;
+    vertical-align: middle;
+}
+
+.leaderboard-score-details {
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .08);
+    overflow: hidden;
+}
+
+.leaderboard-card.current-user .leaderboard-score-details {
+    background: rgba(2, 6, 23, .08);
+    border-color: rgba(2, 6, 23, .16);
+}
+
+.leaderboard-score-details summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 11px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.leaderboard-score-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.leaderboard-score-details summary>div {
+    min-width: 0;
+}
+
+.leaderboard-score-details summary strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 1000;
+}
+
+.leaderboard-score-details summary span.muted {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+}
+
+.expand-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+    transition: transform .2s ease;
+}
+
+.leaderboard-score-details[open] .expand-icon {
+    transform: rotate(180deg);
+}
+
+.leaderboard-score-details[open] {
+    background: rgba(255, 255, 255, .07);
+    border-color: rgba(255, 255, 255, .14);
+}
+
+.leaderboard-card.current-user .leaderboard-score-details[open] {
+    background: rgba(2, 6, 23, .12);
+    border-color: rgba(2, 6, 23, .20);
+}
+
+.leaderboard-score-content {
+    padding: 0 12px 12px;
+    display: grid;
+    gap: 7px;
+}
+
+.score-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.leaderboard-card.current-user .score-detail-row {
+    border-top-color: rgba(2, 6, 23, .14);
+}
+
+.score-detail-row:first-child {
+    border-top: 0;
+}
+
+.score-detail-row span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.score-detail-row strong {
+    font-size: 13px;
+    font-weight: 1000;
+}
+
+.score-detail-row strong.winner {
+    color: var(--accent);
+}
+
+.positive-text {
+    color: var(--primary);
+}
+
+.leaderboard-card.current-user .positive-text {
+    color: #020617;
+}
+
+.muted-value {
+    color: var(--muted);
 }

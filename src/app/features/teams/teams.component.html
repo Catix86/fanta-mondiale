@@ -1,0 +1,71 @@
+<main class="teams-content">
+    <h1 class="teams-title">
+        <span class="material-symbols-rounded">emoji_flags</span>
+        <span>Teams</span>
+    </h1>
+
+    @if(teamsScoreboard$ | async; as teams) {
+    @for(team of teams; track team.teamName; let i = $index) {
+    <section class="card team-score-card">
+        <div class="team-score-header">
+            <div class="team-score-title">
+                <div class="team-rank">
+                    {{ i + 1 }}
+                </div>
+                <img class="team-flag" [src]="team.teamName | teamFlag" [alt]="team.teamName" loading="lazy">
+                <div>
+                    <h2>{{ team.teamName }}</h2>
+                    <p class="muted">
+                        {{ team.price }} FC · {{ team.matches }} partite giocate
+                    </p>
+                </div>
+            </div>
+            <!-- PUNTI TOTALI -->
+            <strong class="team-total-points" [class.positive-text]="team.totalPoints > 0"
+                [class.negative-text]="team.totalPoints < 0">
+                {{ team.totalPoints > 0 ? '+' : '' }}{{ team.totalPoints }} pt
+            </strong>
+        </div>
+
+        <!-- BONUS E MALUS TOTALI -->
+        <div class="team-points-breakdown">
+            <span>Bonus:<strong class="positive-text"> +{{ team.bonusPoints }}</strong></span>
+            <span>Malus:<strong class="negative-text"> {{ team.malusPoints }}</strong></span>
+        </div>
+
+        <!-- DETTAGLIO BONUS/MALUS -->
+        <details class="team-events-box">
+            <summary>
+                <div><strong>{{ team.events.length }} Bonus/Malus ricevuti</strong></div>
+                <span class="material-symbols-rounded expand-icon">expand_more</span>
+            </summary>
+
+            <!-- LISTA BONUS/MALUS -->
+            <div class="team-events-content">
+                @if(team.events.length === 0) {
+                <p class="muted no-events">Nessun bonus/malus assegnato.</p>
+                }
+
+                @for(event of team.events; track event.id) {
+                <div class="team-event-row">
+                    <div>
+                        <strong>{{ event.label }}</strong>
+                        <p class="muted">{{ event.matchLabel }}</p>
+                    </div>
+
+                    <span [class.positive]="event.points > 0" [class.negative]="event.points < 0">
+                        {{ event.points > 0 ? '+' : '' }}{{ event.points }}
+                    </span>
+                </div>
+                }
+            </div>
+        </details>
+    </section>
+    }
+    } @else {
+    <!-- ANCORA NESSUNA SQUADRA CARICATA -->
+    <section class="card">
+        <p class="muted">Caricamento squadre...</p>
+    </section>
+    }
+</main>

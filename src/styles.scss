@@ -153,6 +153,10 @@ a {
   grid-template-columns: repeat(5, 1fr);
 }
 
+.bottom-nav-inner.cols-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
 .material-symbols-rounded {
   font-variation-settings:
     'FILL' 0,

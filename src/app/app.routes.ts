@@ -35,6 +35,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/team/team.component').then(m => m.TeamComponent),
       },
       {
+        path: 'teams',
+        loadComponent: () =>
+          import('./features/teams/teams.component').then(m => m.TeamsComponent)
+      },
+      {
         path:
           'admin',
         canActivate: [adminGuard],

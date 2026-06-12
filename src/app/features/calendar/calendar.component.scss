@@ -293,3 +293,108 @@ h1 {
         'GRAD' 0,
         'opsz' 32;
 }
+
+.other-predictions-box {
+    margin-top: 14px;
+    border-radius: 18px;
+    background: rgba(2, 6, 23, .72);
+    border: 1px solid rgba(255, 255, 255, .08);
+    overflow: hidden;
+}
+
+.other-predictions-box summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.other-predictions-box summary::-webkit-details-marker {
+    display: none;
+}
+
+.other-predictions-box summary>div {
+    min-width: 0;
+}
+
+.other-predictions-box summary strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 1000;
+}
+
+.other-predictions-box summary span.muted {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+}
+
+.other-predictions-box[open] {
+    background: rgba(2, 6, 23, .86);
+    border-color: rgba(255, 255, 255, .14);
+}
+
+.other-predictions-box[open] .expand-icon {
+    transform: rotate(180deg);
+}
+
+.other-predictions-content {
+    padding: 0 12px 12px;
+}
+
+.expand-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+    transition: transform .2s ease;
+}
+
+.empty-predictions {
+    margin: 0;
+    padding: 10px 0 0;
+    font-size: 12px;
+}
+
+.prediction-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.prediction-row:first-of-type {
+    border-top: 0;
+}
+
+.prediction-row span {
+    font-size: 13px;
+}
+
+.prediction-row strong {
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .10);
+    font-size: 13px;
+}
+
+.prediction-row strong.prediction-exact {
+    background: rgba(56, 189, 248, .20);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, .45);
+}
+
+.prediction-row strong.prediction-outcome {
+    background: rgba(52, 211, 153, .18);
+    color: #86efac;
+    border: 1px solid rgba(52, 211, 153, .45);
+}
+
+.prediction-row strong.prediction-wrong {
+    background: rgba(251, 113, 133, .18);
+    color: #fb7185;
+    border: 1px solid rgba(251, 113, 133, .45);
+}

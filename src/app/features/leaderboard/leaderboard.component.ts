@@ -30,9 +30,9 @@ import { AppUserRow, LeaderboardRow, TeamScoreView, WorldCupSettings } from '../
 })
 export class LeaderboardComponent {
   private firestore = inject(Firestore);
-  private auth = inject(AuthService);
+  private authService = inject(AuthService);
 
-  user$ = this.auth.appUser$;
+  user$ = this.authService.appUser$;
 
   selectedUserSquad = signal<LeaderboardRow | null>(null);
 
@@ -64,6 +64,10 @@ export class LeaderboardComponent {
     catchError(() => of({} as WorldCupSettings))
   );
 
+  cleanUsername(username: string): string {
+    return this.authService.cleanUsername(username);
+  }
+
   leaderboard$: Observable<LeaderboardRow[]> = combineLatest([
     this.users$,
     this.matches$,
@@ -74,6 +78,7 @@ export class LeaderboardComponent {
   ]).pipe(
     map(([users, matches, predictions, userTeams, teamEvents, settings]) => {
       const matchesMap = new Map<string, Match>();
+      console.log(users);
 
       for (const match of matches) {
         matchesMap.set(match.id, match);

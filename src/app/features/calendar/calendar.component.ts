@@ -373,4 +373,41 @@ export class CalendarComponent implements AfterViewInit {
       input.select();
     });
   }
+
+  predictionResultClass(
+    match: Match,
+    prediction: MatchPredictionView
+  ): string {
+    if (
+      match.status !== 'finished' ||
+      typeof match.officialHomeGoals !== 'number' ||
+      typeof match.officialAwayGoals !== 'number'
+    ) {
+      return '';
+    }
+
+    const exact =
+      prediction.predictedHomeGoals === match.officialHomeGoals &&
+      prediction.predictedAwayGoals === match.officialAwayGoals;
+
+    if (exact) {
+      return 'prediction-exact';
+    }
+
+    const predictedOutcome = this.matchService.getResultOutcome(
+      prediction.predictedHomeGoals,
+      prediction.predictedAwayGoals
+    );
+
+    const officialOutcome = this.matchService.getResultOutcome(
+      match.officialHomeGoals,
+      match.officialAwayGoals
+    );
+
+    if (predictedOutcome === officialOutcome) {
+      return 'prediction-outcome';
+    }
+
+    return 'prediction-wrong';
+  }
 }

@@ -71,32 +71,42 @@
             Salva pronostico
             }
         </button>
-        } @else {
+        } @else if(match.status !== 'finished') {
         <p class="locked-message">Pronostico bloccato</p>
         }
-        @if(locked(match) && matchPredictions(match.id).length > 0) {
-        <div class="other-predictions">
-            <div class="other-predictions-header">
-                <strong>Pronostici dei giocatori</strong>
-                <span>{{ matchPredictions(match.id).length }}</span>
-            </div>
+        @if(locked(match) || (user$ | async)?.role === 'admin') {
+        <details class="other-predictions-box">
+            <summary>
+                <div>
+                    <strong>Pronostici dei giocatori</strong>
+                    <span class="muted">
+                        {{ matchPredictions(match.id).length }} pronostici
+                    </span>
+                    </div>
 
-            @if(matchPredictions(match.id).length === 0) {
-            <p class="muted empty-predictions">
-                Nessun pronostico inserito.
-            </p>
-            }
+                <span class="material-symbols-rounded expand-icon">
+                    expand_more
+                </span>
+                </summary>
 
-            @for(prediction of matchPredictions(match.id); track prediction.uid) {
-            <div class="prediction-row">
-                <span>{{ prediction.username }}</span>
+                <div class="other-predictions-content">
+                @if(matchPredictions(match.id).length === 0) {
+                <p class="muted empty-predictions">
+                    Nessun pronostico inserito.
+                </p>
+                }
 
-                <strong>
-                    {{ prediction.predictedHomeGoals }}-{{ prediction.predictedAwayGoals }}
-                </strong>
-            </div>
-            }
-        </div>
+                @for(prediction of matchPredictions(match.id); track prediction.uid) {
+                <div class="prediction-row">
+                    <span>{{ prediction.username }}</span>
+
+                    <strong [class]="predictionResultClass(match, prediction)">
+                        {{ prediction.predictedHomeGoals }}-{{ prediction.predictedAwayGoals }}
+                    </strong>
+                    </div>
+                    }
+                    </div>
+        </details>
         }
     </section>
     }
