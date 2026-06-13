@@ -1,13 +1,16 @@
-import { Component, inject, signal } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { shareReplay, tap } from 'rxjs';
 import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { MatchService } from '../../core/services/match.service';
 import { Match, MatchStage } from '../../core/models/match.model';
 import { WORLD_CUP_TEAMS } from '../../core/constants/teams';
 import { TeamEventService } from '../../core/services/team-event.service';
 import { FANTATEAM_RULES } from '../../core/constants/fantateam-rules';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   standalone: true,
@@ -18,38 +21,24 @@ import { FANTATEAM_RULES } from '../../core/constants/fantateam-rules';
 export class AdminComponent {
   private matches = inject(MatchService);
   private fb = inject(FormBuilder);
+  private teamEvents = inject(TeamEventService);
+  private toast = inject(ToastService);
+  private destroyRef = inject(DestroyRef);
 
   teams = WORLD_CUP_TEAMS;
-  matches$ = this.matches.getMatches();
+  rules = FANTATEAM_RULES;
 
-  matchTeams$: Observable<string[]> = this.matches$.pipe(
-    map(matches => {
-      const teams = matches.flatMap(match => [
-        match.homeTeam,
-        match.awayTeam
-      ]);
+  private currentMatches: Match[] = [];
 
-      return Array.from(new Set(teams))
-        .filter(Boolean)
-        .sort((a, b) => a.localeCompare(b, 'it'));
-    })
+  matches$ = this.matches.getMatches().pipe(
+    tap(matches => {
+      this.currentMatches = matches;
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
   );
-
 
   savingMatchId = signal<string | null>(null);
   creatingMatch = signal(false);
-  successMessage = signal('');
-  errorMessage = signal('');
-
-  private teamEvents = inject(TeamEventService);
-
-  rules = FANTATEAM_RULES;
-
-  teamEventForm = this.fb.nonNullable.group({
-    matchId: ['', Validators.required],
-    teamName: ['', Validators.required],
-    ruleId: ['', Validators.required]
-  });
 
   stages: { label: string; value: MatchStage }[] = [
     { label: 'Girone', value: 'group' },
@@ -68,17 +57,77 @@ export class AdminComponent {
     kickoffAt: ['', Validators.required]
   });
 
+  teamEventForm = this.fb.nonNullable.group({
+    matchId: ['', Validators.required],
+    teamName: ['', Validators.required],
+    ruleIds: [[] as string[], Validators.required]
+  });
+
   drafts: Record<string, { home: number; away: number }> = {};
 
+  constructor() {
+    this.teamEventForm.controls.matchId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.teamEventForm.controls.teamName.setValue('');
+      });
+  }
+
   draft(matchId: string): { home: number; away: number } {
-    if (!this.drafts[matchId]) this.drafts[matchId] = { home: 0, away: 0 };
+    if (!this.drafts[matchId]) {
+      this.drafts[matchId] = { home: 0, away: 0 };
+    }
+
     return this.drafts[matchId];
   }
 
   matchDate(match: Match): Date {
     const kickoffAt: any = match.kickoffAt;
-    if (kickoffAt?.toDate) return kickoffAt.toDate();
+
+    if (kickoffAt?.toDate) {
+      return kickoffAt.toDate();
+    }
+
     return new Date(kickoffAt);
+  }
+
+  selectedMatchTeams(): string[] {
+    const matchId = this.teamEventForm.controls.matchId.value;
+
+    if (!matchId) {
+      return [];
+    }
+
+    const match = this.currentMatches.find(item => item.id === matchId);
+
+    if (!match) {
+      return [];
+    }
+
+    return Array.from(new Set([
+      match.homeTeam,
+      match.awayTeam
+    ]));
+  }
+
+  selectedRuleIds(): string[] {
+    return this.teamEventForm.controls.ruleIds.value;
+  }
+
+  isRuleSelected(ruleId: string): boolean {
+    return this.selectedRuleIds().includes(ruleId);
+  }
+
+  toggleRule(ruleId: string): void {
+    const current = this.selectedRuleIds();
+
+    const next = current.includes(ruleId)
+      ? current.filter(id => id !== ruleId)
+      : [...current, ruleId];
+
+    this.teamEventForm.controls.ruleIds.setValue(next);
+    this.teamEventForm.controls.ruleIds.markAsDirty();
+    this.teamEventForm.controls.ruleIds.markAsTouched();
   }
 
   statusLabel(status: string): string {
@@ -91,30 +140,28 @@ export class AdminComponent {
   }
 
   async createMatch(): Promise<void> {
-    this.successMessage.set('');
-    this.errorMessage.set('');
-
     if (this.createMatchForm.invalid) {
       this.createMatchForm.markAllAsTouched();
-      this.errorMessage.set('Compila squadre, fase e data/ora.');
+      this.toast.show('Compila squadre, fase e data/ora.', 'error');
       return;
     }
 
     const value = this.createMatchForm.getRawValue();
 
     if (!value.homeTeam || !value.awayTeam) {
-      this.errorMessage.set('Seleziona entrambe le squadre.');
+      this.toast.show('Seleziona entrambe le squadre.', 'error');
       return;
     }
 
     if (value.homeTeam.trim().toLowerCase() === value.awayTeam.trim().toLowerCase()) {
-      this.errorMessage.set('Le due squadre devono essere diverse.');
+      this.toast.show('Le due squadre devono essere diverse.', 'error');
       return;
     }
 
     const kickoffAt = new Date(value.kickoffAt);
+
     if (Number.isNaN(kickoffAt.getTime())) {
-      this.errorMessage.set('Data e ora non valide.');
+      this.toast.show('Data e ora non valide.', 'error');
       return;
     }
 
@@ -129,31 +176,34 @@ export class AdminComponent {
         kickoffAt
       });
 
-      this.successMessage.set('Match creato correttamente.');
-      this.createMatchForm.reset({ homeTeam: '', awayTeam: '', group: '', stage: 'group', kickoffAt: '' });
+      this.toast.show('Match creato correttamente.');
+      this.createMatchForm.reset({
+        homeTeam: '',
+        awayTeam: '',
+        group: '',
+        stage: 'group',
+        kickoffAt: ''
+      });
     } catch (error) {
       console.error('Errore creazione match:', error);
-      this.errorMessage.set('Match non creato. Verifica ruolo admin e regole Firestore.');
+      this.toast.show('Match non creato. Verifica ruolo admin e regole Firestore.', 'error');
     } finally {
       this.creatingMatch.set(false);
     }
   }
 
   async saveResult(match: Match): Promise<void> {
-    this.successMessage.set('');
-    this.errorMessage.set('');
-
     const draft = this.draft(match.id);
     const homeGoals = Number(draft.home);
     const awayGoals = Number(draft.away);
 
     if (!Number.isInteger(homeGoals) || !Number.isInteger(awayGoals)) {
-      this.errorMessage.set('Inserisci un risultato valido.');
+      this.toast.show('Inserisci un risultato valido.', 'error');
       return;
     }
 
     if (homeGoals < 0 || awayGoals < 0 || homeGoals > 30 || awayGoals > 30) {
-      this.errorMessage.set('Il risultato deve essere tra 0 e 30.');
+      this.toast.show('Il risultato deve essere tra 0 e 30.', 'error');
       return;
     }
 
@@ -161,60 +211,59 @@ export class AdminComponent {
 
     try {
       await this.matches.setOfficialResult(match.id, homeGoals, awayGoals);
-      this.successMessage.set('Risultato ufficiale salvato correttamente.');
+      this.toast.show('Risultato ufficiale salvato correttamente.');
     } catch (error) {
       console.error('Errore salvataggio risultato:', error);
-      this.errorMessage.set('Risultato non salvato. Verifica di avere ruolo admin e rules corrette.');
+      this.toast.show('Risultato non salvato. Verifica ruolo admin e rules corrette.', 'error');
     } finally {
       this.savingMatchId.set(null);
     }
   }
 
   async importGroupStage2026(): Promise<void> {
-    this.successMessage.set('');
-    this.errorMessage.set('');
     this.creatingMatch.set(true);
 
     try {
       const count = await this.matches.importWorldCup2026GroupStageMatches();
-      this.successMessage.set(`Import completato: ${count} partite della fase a gironi create/aggiornate.`);
+      this.toast.show(`Import completato: ${count} partite create/aggiornate.`);
     } catch (error) {
       console.error('Errore import calendario:', error);
-      this.errorMessage.set('Import non riuscito. Verifica ruolo admin e Firestore Rules.');
+      this.toast.show('Import non riuscito. Verifica ruolo admin e Firestore Rules.', 'error');
     } finally {
       this.creatingMatch.set(false);
     }
   }
 
   async addTeamEvent(): Promise<void> {
-    this.successMessage.set('');
-    this.errorMessage.set('');
-
-    if (this.teamEventForm.invalid) {
+    if (this.teamEventForm.invalid || this.selectedRuleIds().length === 0) {
       this.teamEventForm.markAllAsTouched();
-      this.errorMessage.set('Seleziona partita, squadra e bonus/malus.');
+      this.toast.show('Seleziona partita, squadra e almeno un bonus/malus.', 'error');
       return;
     }
 
     const value = this.teamEventForm.getRawValue();
 
     try {
-      await this.teamEvents.addTeamEvent(
-        value.matchId,
-        value.teamName,
-        value.ruleId
+      await Promise.all(
+        value.ruleIds.map(ruleId =>
+          this.teamEvents.addTeamEvent(
+            value.matchId,
+            value.teamName,
+            ruleId
+          )
+        )
       );
 
-      this.successMessage.set('Bonus/Malus squadra inserito correttamente.');
+      this.toast.show(`${value.ruleIds.length} bonus/malus inseriti correttamente.`);
 
       this.teamEventForm.reset({
         matchId: '',
         teamName: '',
-        ruleId: ''
+        ruleIds: []
       });
     } catch (error) {
       console.error('Errore inserimento bonus/malus:', error);
-      this.errorMessage.set('Bonus/Malus non inserito. Verifica ruolo admin e rules.');
+      this.toast.show('Bonus/Malus non inseriti. Verifica ruolo admin e rules.', 'error');
     }
   }
 }

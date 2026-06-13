@@ -131,3 +131,121 @@ label {
         'GRAD' 0,
         'opsz' 32;
 }
+
+.admin-accordion {
+    border-radius: 22px;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.admin-accordion summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.admin-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-accordion summary>div {
+    min-width: 0;
+}
+
+.admin-accordion summary strong {
+    display: block;
+    font-size: 16px;
+    font-weight: 1000;
+}
+
+.admin-accordion summary span.muted {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+}
+
+.admin-accordion[open] {
+    background: rgba(255, 255, 255, .08);
+    border-color: rgba(255, 255, 255, .16);
+}
+
+.admin-accordion[open] .expand-icon {
+    transform: rotate(180deg);
+}
+
+.expand-icon {
+    flex-shrink: 0;
+    font-size: 24px;
+    transition: transform .2s ease;
+}
+
+.accordion-content {
+    padding: 0 14px 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.inner-card {
+    background: rgba(2, 6, 23, .35);
+}
+
+.rules-picker {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding-right: 2px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.rule-choice {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 16px;
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255, 255, 255, .06);
+  color: var(--text);
+  text-align: left;
+}
+
+.rule-choice.selected {
+  background: rgba(52, 211, 153, .14);
+  border-color: rgba(52, 211, 153, .42);
+}
+
+.rule-points {
+  min-width: 42px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 1000;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.rule-label {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.selected-rules-count {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+.positive {
+  background: rgba(52, 211, 153, .16);
+  color: var(--primary);
+}
+
+.negative {
+  background: rgba(251, 113, 133, .16);
+  color: #fb7185;
+}

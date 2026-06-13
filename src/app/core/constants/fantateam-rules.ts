@@ -53,7 +53,7 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         id: 'rigore-procurato',
         category: 'attack',
         points: 3,
-        label: 'Rigore procurato',
+        label: 'Il massimo castigo',
         description: 'Alla squadra viene assegnato un calcio di rigore.'
     },
     {
@@ -64,10 +64,10 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'La squadra finisce la partita senza subire gol.'
     },
     {
-        id: 'ipnotizzatore',
+        id: 'mani-di-fata',
         category: 'defense',
         points: 8,
-        label: 'Ipnotizzatore',
+        label: 'Mani di Fata',
         description: 'Il portiere della squadra para un calcio di rigore.'
     },
     {
@@ -76,6 +76,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         points: 2,
         label: 'Noia mortale',
         description: 'La partita finisce 0-0.'
+    },
+    {
+        id: 'buona-condotta',
+        category: 'pop',
+        points: 10,
+        label: 'Buona condotta',
+        description: 'La squadra non riceve nessun cartellino giallo o rosso.'
     },
     {
         id: 'legno',
@@ -88,22 +95,22 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         id: 'freekick',
         category: 'pop',
         points: 10,
-        label: 'Gol su calcio di punizione',
+        label: 'Pennellata vincente',
         description: 'La squadra segna un gol direttamente da calcio di punizione.'
     },
     {
         id: 'invasione-campo',
         category: 'pop',
         points: 30,
-        label: 'Invasione di campo',
+        label: 'Ultras fuori programma',
         description: 'Un tifoso con la maglia o la bandiera della squadra invade il campo.'
     },
     {
         id: 'esultanza-volgare',
         category: 'pop',
         points: 5,
-        label: 'Esultanza volgare',
-        description: 'Il giocatore che segna esulta in maniera un po’ volgare.'
+        label: 'Celebrazione iconica',
+        description: 'Il giocatore che segna esulta in maniera un po’ particolare.'
     },
     {
         id: 'danza-vittoria',
@@ -124,7 +131,7 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         category: 'knockout',
         points: 15,
         label: 'Cuore freddo',
-        description: 'La squadra vince la partita alla lotteria dei calci di rigore finali.'
+        description: 'La squadra vince la partita alla lotteria dei calci di rigore.'
     },
     {
         id: 'campione-mondo',
@@ -138,13 +145,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         category: 'malus',
         points: -5,
         label: 'Sconfitta',
-        description: 'La squadra perde la partita.'
+        description: 'La squadra perde miseramente la partita.'
     },
     {
         id: 'autogol',
         category: 'malus',
         points: -5,
-        label: 'Autogol',
+        label: 'Fuoco amico',
         description: 'Un giocatore della squadra fa autogol.'
     },
     {
@@ -186,7 +193,7 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         id: 'rigore-fallito',
         category: 'malus',
         points: -5,
-        label: 'Rigore fallito',
+        label: 'Dischetto amaro',
         description: 'La squadra non segna un rigore.'
     },
     {

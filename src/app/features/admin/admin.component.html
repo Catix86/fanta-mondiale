@@ -6,178 +6,235 @@
     <span>Admin</span>
   </h1>
 
-
-  @if(successMessage()) {
-  <section class="card success-card">
-    <p>{{ successMessage() }}</p>
-  </section>
-  }
-  @if(errorMessage()) {
-  <section class="card error-card">
-    <p>{{ errorMessage() }}</p>
-  </section>
-  }
-
-  <!-- <section class="card">
-    <h2>Import calendario gironi 2026</h2>
-    <p class="muted">
-      Crea/aggiorna automaticamente le 72 partite della fase a gironi del Mondiale 2026.
-      Gli ID sono deterministici, quindi se lo lanci due volte non crea duplicati.
-    </p>
-
-    <button class="btn warn" type="button" [disabled]="creatingMatch()" (click)="importGroupStage2026()">
-      @if(creatingMatch()) { Import in corso... } @else { Importa 72 partite gironi }
-    </button>
-  </section> -->
-
-  <section class="card">
-    <h2>Nuova partita</h2>
-    <p class="muted">Crea un match del calendario. Sarà subito visibile agli utenti.</p>
-
-    <form [formGroup]="createMatchForm" (ngSubmit)="createMatch()" class="match-form">
+  <!-- ADD NEW MATCH -->
+  <details class="admin-accordion">
+    <summary>
       <div>
-        <label class="muted">Squadra casa</label>
-        <select class="input" formControlName="homeTeam">
-          <option value="">Seleziona squadra casa</option>
-          @for(team of teams; track team) {
-          <option [value]="team">{{ team }}</option>
-          }
-        </select>
+        <strong>Nuova partita</strong>
+        <span class="muted">Crea un match del calendario</span>
       </div>
 
-      <div>
-        <label class="muted">Squadra trasferta</label>
-        <select class="input" formControlName="awayTeam">
-          <option value="">Seleziona squadra trasferta</option>
-          @for(team of teams; track team) {
-          <option [value]="team">{{ team }}</option>
-          }
-        </select>
-      </div>
+      <span class="material-symbols-rounded expand-icon">
+        expand_more
+      </span>
+    </summary>
 
-      <div class="grid-2">
+    <div class="accordion-content">
+      <p class="muted">Crea un match del calendario. Sarà subito visibile agli utenti.</p>
+
+      <form [formGroup]="createMatchForm" (ngSubmit)="createMatch()" class="match-form">
         <div>
-          <label class="muted">Gruppo</label>
-          <input class="input" formControlName="group" placeholder="Es. A">
-        </div>
-        <div>
-          <label class="muted">Fase</label>
-          <select class="input" formControlName="stage">
-            @for(stage of stages; track stage.value) {
-            <option [value]="stage.value">{{ stage.label }}</option>
+          <label class="muted">Squadra casa</label>
+          <select class="input" formControlName="homeTeam">
+            <option value="">Seleziona squadra casa</option>
+            @for(team of teams; track team) {
+            <option [value]="team">{{ team }}</option>
             }
           </select>
         </div>
-      </div>
 
-      <div>
-        <label class="muted">Data e ora</label>
-        <input class="input" type="datetime-local" formControlName="kickoffAt">
-      </div>
-
-      <button class="btn warn" type="submit" [disabled]="creatingMatch()">
-        @if(creatingMatch()) { Creazione... } @else { Crea partita }
-      </button>
-    </form>
-  </section>
-  <section class="card">
-    <h2>Inserisci Bonus/Malus squadra</h2>
-
-    <form [formGroup]="teamEventForm" (ngSubmit)="addTeamEvent()" class="match-form">
-      <div>
-        <label class="muted">Partita</label>
-        <select class="input" formControlName="matchId">
-          <option value="">Seleziona partita</option>
-
-          @if(matches$ | async; as matches) {
-          @for(match of matches; track match.id) {
-          <option [value]="match.id">
-            {{ match.homeTeam }} - {{ match.awayTeam }}
-          </option>
-          }
-          }
+        <div>
+          <label class="muted">Squadra trasferta</label>
+          <select class="input" formControlName="awayTeam">
+            <option value="">Seleziona squadra trasferta</option>
+            @for(team of teams; track team) {
+            <option [value]="team">{{ team }}</option>
+            }
           </select>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="muted">Gruppo</label>
+            <input class="input" formControlName="group" placeholder="Es. A">
           </div>
 
-      <div>
-        <label class="muted">Squadra</label>
-        <select class="input" formControlName="teamName">
-          <option value="">Seleziona squadra</option>
-
-          @if(matchTeams$ | async; as teams) {
-          @for(team of teams; track team) {
-          <option [value]="team">{{ team }}</option>
-          }
-          }
-          </select>
+          <div>
+            <label class="muted">Fase</label>
+            <select class="input" formControlName="stage">
+              @for(stage of stages; track stage.value) {
+              <option [value]="stage.value">{{ stage.label }}</option>
+              }
+            </select>
           </div>
+        </div>
 
-      <div>
-        <label class="muted">Bonus/Malus</label>
-        <select class="input" formControlName="ruleId">
-          <option value="">Seleziona bonus/malus</option>
+        <div>
+          <label class="muted">Data e ora</label>
+          <input class="input" type="datetime-local" formControlName="kickoffAt">
+        </div>
 
-          @for(rule of rules; track rule.id) {
-          <option [value]="rule.id">
-            {{ rule.points > 0 ? '+' : '' }}{{ rule.points }} - {{ rule.label }}
-          </option>
-          }
-          </select>
-          </div>
-
-      <button class="btn warn" type="submit">
-        Inserisci Bonus/Malus
-      </button>
+        <button class="btn warn" type="submit" [disabled]="creatingMatch()">
+          @if(creatingMatch()) { Creazione... } @else { Crea partita }
+        </button>
       </form>
-  </section>
+    </div>
+  </details>
 
-  <section class="card">
-    <h2>Gestione risultati</h2>
-    <p class="muted">Inserisci il risultato ufficiale. Quando salvi, la partita passa allo stato
-      <strong>finished</strong>.</p>
-  </section>
+  <!-- BONUS/MALUS -->
+  <details class="admin-accordion">
+    <summary>
+      <div>
+        <strong>Bonus/Malus squadra</strong>
+        <span class="muted">Inserisci uno o più eventi per una squadra</span>
+      </div>
 
-  @if(matches$ | async; as matches) {
-  @if(matches.length === 0) {
-  <section class="card">
-    <h2>Nessuna partita</h2>
-    <p class="muted">Usa il form sopra per creare la prima partita.</p>
-  </section>
-  }
-
-  @for(match of matches; track match.id) {
-  <section class="card match-admin-card">
-    <div class="match-admin-topline">
-      <strong>{{ match.homeTeam }} - {{ match.awayTeam }}</strong>
-      <span class="status-badge" [ngClass]="{
-          'status-scheduled': match.status === 'scheduled',
-          'status-live': match.status === 'live',
-          'status-finished': match.status === 'finished'
-        }">
-        {{ statusLabel(match.status) }}
+      <span class="material-symbols-rounded expand-icon">
+        expand_more
       </span>
+    </summary>
+
+    <div class="accordion-content">
+      <form [formGroup]="teamEventForm" (ngSubmit)="addTeamEvent()" class="match-form">
+        <div>
+          <label class="muted">Partita</label>
+          <select class="input" formControlName="matchId">
+            <option value="">Seleziona partita</option>
+
+            @if(matches$ | async; as matches) {
+            @for(match of matches; track match.id) {
+            <option [value]="match.id">
+              {{ match.homeTeam }} - {{ match.awayTeam }}
+            </option>
+            }
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="muted">Squadra</label>
+
+          <select class="input" formControlName="teamName" [disabled]="!teamEventForm.controls.matchId.value">
+            <option value="">
+              @if(teamEventForm.controls.matchId.value) {
+              Seleziona squadra
+              } @else {
+              Prima seleziona una partita
+              }
+            </option>
+
+            @for(team of selectedMatchTeams(); track team) {
+            <option [value]="team">
+              {{ team }}
+            </option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="muted">Bonus</label>
+
+          <div class="rules-picker">
+            @for(rule of rules.filter(r => r.points > 0); track rule.id) {
+            <button type="button" class="rule-choice" [class.selected]="isRuleSelected(rule.id)"
+              (click)="toggleRule(rule.id)">
+              <span class="rule-points" [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
+                {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
+              </span>
+
+              <span class="rule-label">
+                {{ rule.label }}
+              </span>
+            </button>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label class="muted">Malus</label>
+
+          <div class="rules-picker">
+            @for(rule of rules.filter(r => r.points < 0); track rule.id) { <button type="button" class="rule-choice"
+              [class.selected]="isRuleSelected(rule.id)" (click)="toggleRule(rule.id)">
+              <span class="rule-points" [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
+                {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
+              </span>
+
+              <span class="rule-label">
+                {{ rule.label }}
+              </span>
+              </button>
+              }
+          </div>
+        </div>
+
+        <button class="btn warn" type="submit">
+          Inserisci Bonus/Malus
+        </button>
+      </form>
     </div>
+  </details>
 
-    <p class="muted match-date">{{ matchDate(match) | date:'dd MMM HH:mm' }}</p>
+  <!-- MANAGE MATCH RESULTS -->
+  <details class="admin-accordion">
+    <summary>
+      <div>
+        <strong>Gestione risultati</strong>
+        <span class="muted">Inserisci risultati ufficiali</span>
+      </div>
 
-    @if(match.status === 'finished') {
-    <p class="official-result">Risultato attuale:
-      <strong>{{ match.officialHomeGoals }}-{{ match.officialAwayGoals }}</strong></p>
-    }
+      <span class="material-symbols-rounded expand-icon">
+        expand_more
+      </span>
+    </summary>
 
-    <div class="result-row">
-      <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).home">
-      <strong>-</strong>
-      <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).away">
-      <button class="btn save-result-btn" [disabled]="savingMatchId() === match.id" (click)="saveResult(match)">
-        @if(savingMatchId() === match.id) { Salvo... } @else { Salva }
-      </button>
+    <div class="accordion-content">
+      <p class="muted">
+        Inserisci il risultato ufficiale. Quando salvi, la partita passa allo stato
+        <strong>finished</strong>.
+      </p>
+
+      @if(matches$ | async; as matches) {
+      @if(matches.length === 0) {
+      <section class="card inner-card">
+        <h2>Nessuna partita</h2>
+        <p class="muted">Usa il form sopra per creare la prima partita.</p>
+      </section>
+      }
+
+      @for(match of matches; track match.id) {
+      <section class="card match-admin-card">
+        <div class="match-admin-topline">
+          <strong>{{ match.homeTeam }} - {{ match.awayTeam }}</strong>
+
+          <span class="status-badge" [ngClass]="{
+                  'status-scheduled': match.status === 'scheduled',
+                  'status-live': match.status === 'live',
+                  'status-finished': match.status === 'finished'
+                }">
+            {{ statusLabel(match.status) }}
+          </span>
+        </div>
+
+        <p class="muted match-date">
+          {{ matchDate(match) | date:'dd MMM HH:mm' }}
+        </p>
+
+        @if(match.status === 'finished') {
+        <p class="official-result">
+          Risultato attuale:
+          <strong>{{ match.officialHomeGoals }}-{{ match.officialAwayGoals }}</strong>
+        </p>
+        }
+
+        <div class="result-row">
+          <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).home">
+
+          <strong>-</strong>
+
+          <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).away">
+
+          <button class="btn save-result-btn" [disabled]="savingMatchId() === match.id" (click)="saveResult(match)">
+            @if(savingMatchId() === match.id) { Salvo... } @else { Salva }
+          </button>
+        </div>
+      </section>
+      }
+      } @else {
+      <section class="card inner-card">
+        <p class="muted">Caricamento partite...</p>
+      </section>
+      }
     </div>
-  </section>
-  }
-  } @else {
-  <section class="card">
-    <p class="muted">Caricamento partite...</p>
-  </section>
-  }
+  </details>
 </main>

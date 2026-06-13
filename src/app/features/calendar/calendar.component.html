@@ -74,22 +74,17 @@
         } @else if(match.status !== 'finished') {
         <p class="locked-message">Pronostico bloccato</p>
         }
-        @if(locked(match) || (user$ | async)?.role === 'admin') {
+        <!-- PRONOSTICI -->
         <details class="other-predictions-box">
             <summary>
                 <div>
                     <strong>Pronostici dei giocatori</strong>
-                    <span class="muted">
-                        {{ matchPredictions(match.id).length }} pronostici
-                    </span>
-                    </div>
+                    <span class="muted">{{ matchPredictions(match.id).length }} pronostici</span>
+                </div>
+                <span class="material-symbols-rounded expand-icon">expand_more</span>
+            </summary>
 
-                <span class="material-symbols-rounded expand-icon">
-                    expand_more
-                </span>
-                </summary>
-
-                <div class="other-predictions-content">
+            <div class="other-predictions-content">
                 @if(matchPredictions(match.id).length === 0) {
                 <p class="muted empty-predictions">
                     Nessun pronostico inserito.
@@ -100,14 +95,19 @@
                 <div class="prediction-row">
                     <span>{{ prediction.username }}</span>
 
+                    @if(locked(match) || (user$ | async)?.role === 'admin' || (user$ | async)?.username ===
+                    prediction.username) {
                     <strong [class]="predictionResultClass(match, prediction)">
                         {{ prediction.predictedHomeGoals }}-{{ prediction.predictedAwayGoals }}
                     </strong>
-                    </div>
                     }
-                    </div>
+                    @else {
+                    <strong [class]="predictionResultClass(match, prediction)">-</strong>
+                    }
+                </div>
+                }
+            </div>
         </details>
-        }
     </section>
     }
     } @else {
