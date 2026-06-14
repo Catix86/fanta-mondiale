@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { shareReplay, tap } from 'rxjs';
+import { map, shareReplay, tap } from 'rxjs';
 import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -19,10 +19,10 @@ import { ToastService } from '../../core/services/toast.service';
   styleUrl: './admin.component.scss'
 })
 export class AdminComponent {
-  private matches = inject(MatchService);
+  private matcheService = inject(MatchService);
+  private teamEventService = inject(TeamEventService);
+  private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
-  private teamEvents = inject(TeamEventService);
-  private toast = inject(ToastService);
   private destroyRef = inject(DestroyRef);
 
   teams = WORLD_CUP_TEAMS;
@@ -30,7 +30,19 @@ export class AdminComponent {
 
   private currentMatches: Match[] = [];
 
-  matches$ = this.matches.getMatches().pipe(
+  matches$ = this.matcheService.getMatches().pipe(
+    map(matches =>
+      [...matches].sort((a, b) => {
+        const aFinished = a.status === 'finished';
+        const bFinished = b.status === 'finished';
+
+        if (aFinished !== bFinished) {
+          return aFinished ? 1 : -1;
+        }
+
+        return this.matchDate(a).getTime() - this.matchDate(b).getTime();
+      })
+    ),
     tap(matches => {
       this.currentMatches = matches;
     }),
@@ -132,9 +144,9 @@ export class AdminComponent {
 
   statusLabel(status: string): string {
     switch (status) {
-      case 'scheduled': return 'Programmato';
+      case 'scheduled': return 'Programmata';
       case 'live': return 'In corso';
-      case 'finished': return 'Terminato';
+      case 'finished': return 'Terminata';
       default: return status;
     }
   }
@@ -142,33 +154,33 @@ export class AdminComponent {
   async createMatch(): Promise<void> {
     if (this.createMatchForm.invalid) {
       this.createMatchForm.markAllAsTouched();
-      this.toast.show('Compila squadre, fase e data/ora.', 'error');
+      this.toastService.show('Compila squadre, fase e data/ora.', 'error');
       return;
     }
 
     const value = this.createMatchForm.getRawValue();
 
     if (!value.homeTeam || !value.awayTeam) {
-      this.toast.show('Seleziona entrambe le squadre.', 'error');
+      this.toastService.show('Seleziona entrambe le squadre.', 'error');
       return;
     }
 
     if (value.homeTeam.trim().toLowerCase() === value.awayTeam.trim().toLowerCase()) {
-      this.toast.show('Le due squadre devono essere diverse.', 'error');
+      this.toastService.show('Le due squadre devono essere diverse.', 'error');
       return;
     }
 
     const kickoffAt = new Date(value.kickoffAt);
 
     if (Number.isNaN(kickoffAt.getTime())) {
-      this.toast.show('Data e ora non valide.', 'error');
+      this.toastService.show('Data e ora non valide.', 'error');
       return;
     }
 
     this.creatingMatch.set(true);
 
     try {
-      await this.matches.createMatch({
+      await this.matcheService.createMatch({
         homeTeam: value.homeTeam,
         awayTeam: value.awayTeam,
         group: value.group,
@@ -176,7 +188,7 @@ export class AdminComponent {
         kickoffAt
       });
 
-      this.toast.show('Match creato correttamente.');
+      this.toastService.show('Match creato correttamente.');
       this.createMatchForm.reset({
         homeTeam: '',
         awayTeam: '',
@@ -186,7 +198,7 @@ export class AdminComponent {
       });
     } catch (error) {
       console.error('Errore creazione match:', error);
-      this.toast.show('Match non creato. Verifica ruolo admin e regole Firestore.', 'error');
+      this.toastService.show('Match non creato. Verifica ruolo admin e regole Firestore.', 'error');
     } finally {
       this.creatingMatch.set(false);
     }
@@ -198,23 +210,23 @@ export class AdminComponent {
     const awayGoals = Number(draft.away);
 
     if (!Number.isInteger(homeGoals) || !Number.isInteger(awayGoals)) {
-      this.toast.show('Inserisci un risultato valido.', 'error');
+      this.toastService.show('Inserisci un risultato valido.', 'error');
       return;
     }
 
     if (homeGoals < 0 || awayGoals < 0 || homeGoals > 30 || awayGoals > 30) {
-      this.toast.show('Il risultato deve essere tra 0 e 30.', 'error');
+      this.toastService.show('Il risultato deve essere tra 0 e 30.', 'error');
       return;
     }
 
     this.savingMatchId.set(match.id);
 
     try {
-      await this.matches.setOfficialResult(match.id, homeGoals, awayGoals);
-      this.toast.show('Risultato ufficiale salvato correttamente.');
+      await this.matcheService.setOfficialResult(match.id, homeGoals, awayGoals);
+      this.toastService.show('Risultato ufficiale salvato correttamente.');
     } catch (error) {
       console.error('Errore salvataggio risultato:', error);
-      this.toast.show('Risultato non salvato. Verifica ruolo admin e rules corrette.', 'error');
+      this.toastService.show('Risultato non salvato. Verifica ruolo admin e rules corrette.', 'error');
     } finally {
       this.savingMatchId.set(null);
     }
@@ -224,11 +236,11 @@ export class AdminComponent {
     this.creatingMatch.set(true);
 
     try {
-      const count = await this.matches.importWorldCup2026GroupStageMatches();
-      this.toast.show(`Import completato: ${count} partite create/aggiornate.`);
+      const count = await this.matcheService.importWorldCup2026GroupStageMatches();
+      this.toastService.show(`Import completato: ${count} partite create/aggiornate.`);
     } catch (error) {
       console.error('Errore import calendario:', error);
-      this.toast.show('Import non riuscito. Verifica ruolo admin e Firestore Rules.', 'error');
+      this.toastService.show('Import non riuscito. Verifica ruolo admin e Firestore Rules.', 'error');
     } finally {
       this.creatingMatch.set(false);
     }
@@ -237,7 +249,7 @@ export class AdminComponent {
   async addTeamEvent(): Promise<void> {
     if (this.teamEventForm.invalid || this.selectedRuleIds().length === 0) {
       this.teamEventForm.markAllAsTouched();
-      this.toast.show('Seleziona partita, squadra e almeno un bonus/malus.', 'error');
+      this.toastService.show('Seleziona partita, squadra e almeno un bonus/malus.', 'error');
       return;
     }
 
@@ -246,7 +258,7 @@ export class AdminComponent {
     try {
       await Promise.all(
         value.ruleIds.map(ruleId =>
-          this.teamEvents.addTeamEvent(
+          this.teamEventService.addTeamEvent(
             value.matchId,
             value.teamName,
             ruleId
@@ -254,7 +266,7 @@ export class AdminComponent {
         )
       );
 
-      this.toast.show(`${value.ruleIds.length} bonus/malus inseriti correttamente.`);
+      this.toastService.show(`${value.ruleIds.length} bonus/malus inseriti correttamente.`);
 
       this.teamEventForm.reset({
         matchId: '',
@@ -263,7 +275,7 @@ export class AdminComponent {
       });
     } catch (error) {
       console.error('Errore inserimento bonus/malus:', error);
-      this.toast.show('Bonus/Malus non inseriti. Verifica ruolo admin e rules.', 'error');
+      this.toastService.show('Bonus/Malus non inseriti. Verifica ruolo admin e rules.', 'error');
     }
   }
 }

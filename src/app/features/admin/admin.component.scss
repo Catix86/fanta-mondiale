@@ -61,6 +61,7 @@ label {
     justify-content: space-between;
     gap: 8px;
     align-items: center;
+    margin-bottom: 8px;
 }
 
 .status-badge {
@@ -88,13 +89,21 @@ label {
     background: #020617;
     border-radius: 16px;
     padding: 12px;
-    margin: 0 0 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+
+    strong {
+        font-size: 20px;
+    }
 }
 
 .result-row {
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: space-between;
 }
 
 .result-input {
@@ -195,57 +204,65 @@ label {
 }
 
 .rules-picker {
-  display: grid;
-  gap: 8px;
-  margin-top: 8px;
-  padding-right: 2px;
-  grid-template-columns: 1fr 1fr;
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+    padding-right: 2px;
+    grid-template-columns: 1fr 1fr;
 }
 
 .rule-choice {
-  width: 100%;
-  border: 1px solid rgba(255, 255, 255, .08);
-  border-radius: 16px;
-  padding: 9px 10px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  background: rgba(255, 255, 255, .06);
-  color: var(--text);
-  text-align: left;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 16px;
+    padding: 9px 10px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255, 255, 255, .06);
+    color: var(--text);
+    text-align: left;
 }
 
 .rule-choice.selected {
-  background: rgba(52, 211, 153, .14);
-  border-color: rgba(52, 211, 153, .42);
+    background: rgba(52, 211, 153, .14);
+    border-color: rgba(52, 211, 153, .42);
 }
 
 .rule-points {
-  min-width: 42px;
-  padding: 5px 8px;
-  border-radius: 999px;
-  text-align: center;
-  font-weight: 1000;
-  font-size: 12px;
-  flex-shrink: 0;
+    min-width: 42px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    text-align: center;
+    font-weight: 1000;
+    font-size: 12px;
+    flex-shrink: 0;
 }
 
 .rule-label {
-  font-size: 13px;
-  font-weight: 900;
+    font-size: 13px;
+    font-weight: 900;
 }
 
 .selected-rules-count {
-  margin: 8px 0 0;
-  font-size: 12px;
+    margin: 8px 0 0;
+    font-size: 12px;
 }
 
 .positive {
-  background: rgba(52, 211, 153, .16);
-  color: var(--primary);
+    background: rgba(52, 211, 153, .16);
+    color: var(--primary);
 }
 
 .negative {
-  background: rgba(251, 113, 133, .16);
-  color: #fb7185;
+    background: rgba(251, 113, 133, .16);
+    color: #fb7185;
+}
+
+.positive-card {
+    background: rgba(52, 211, 153, .16);
+}
+
+.divider {
+    margin: 10px;
 }

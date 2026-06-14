@@ -6,7 +6,7 @@
     "start": "ng serve --host 0.0.0.0",
     "build": "ng build",
     "test": "ng test",
-    "deploy": "npm run build && firebase deploy"
+    "deploy": "firebase deploy"
   },
   "dependencies": {
     "@angular/animations": "^21.0.0",

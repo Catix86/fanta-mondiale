@@ -179,12 +179,14 @@
     </summary>
 
     <div class="accordion-content">
-      <p class="muted">
+      <!-- <p class="muted">
         Inserisci il risultato ufficiale. Quando salvi, la partita passa allo stato
         <strong>finished</strong>.
-      </p>
+      </p> -->
 
       @if(matches$ | async; as matches) {
+
+      <!-- NO MATCHES -->
       @if(matches.length === 0) {
       <section class="card inner-card">
         <h2>Nessuna partita</h2>
@@ -193,41 +195,43 @@
       }
 
       @for(match of matches; track match.id) {
-      <section class="card match-admin-card">
+      <section class="card match-admin-card" [ngClass]="{
+                  'positive-card': match.status === 'finished'
+                }">
         <div class="match-admin-topline">
           <strong>{{ match.homeTeam }} - {{ match.awayTeam }}</strong>
 
-          <span class="status-badge" [ngClass]="{
+          <!-- <span class="status-badge" [ngClass]="{
                   'status-scheduled': match.status === 'scheduled',
                   'status-live': match.status === 'live',
                   'status-finished': match.status === 'finished'
                 }">
             {{ statusLabel(match.status) }}
+          </span> -->
+          <span class="muted">
+            {{ matchDate(match) | date:'dd MMM HH:mm' }}
           </span>
         </div>
 
-        <p class="muted match-date">
-          {{ matchDate(match) | date:'dd MMM HH:mm' }}
-        </p>
 
         @if(match.status === 'finished') {
         <p class="official-result">
-          Risultato attuale:
-          <strong>{{ match.officialHomeGoals }}-{{ match.officialAwayGoals }}</strong>
+          Risultato finale:
+          <strong>{{ match.officialHomeGoals }} - {{ match.officialAwayGoals }}</strong>
         </p>
-        }
-
+        } @else {
         <div class="result-row">
-          <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).home">
-
-          <strong>-</strong>
-
-          <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).away">
+          <div>
+            <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).home">
+            <strong class="divider">-</strong>
+            <input class="input result-input" inputmode="numeric" min="0" max="30" [(ngModel)]="draft(match.id).away">
+          </div>
 
           <button class="btn save-result-btn" [disabled]="savingMatchId() === match.id" (click)="saveResult(match)">
             @if(savingMatchId() === match.id) { Salvo... } @else { Salva }
           </button>
         </div>
+        }
       </section>
       }
       } @else {
