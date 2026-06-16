@@ -93,17 +93,15 @@
 
                 @for(prediction of matchPredictions(match.id); track prediction.uid) {
                 <div class="prediction-row">
-                    <span>{{ prediction.username }}</span>
+                    <span [ngClass]="{
+                        'my-prediction': (user$ | async)?.username === prediction.username
+                        }">{{ prediction.username }}</span>
 
-                    @if(locked(match) || (user$ | async)?.role === 'admin' || (user$ | async)?.username ===
-                    prediction.username) {
-                    <strong [class]="predictionResultClass(match, prediction)">
+                    <strong [class]="predictionResultClass(match, prediction)" [ngClass]="{
+                        'my-prediction': (user$ | async)?.username === prediction.username
+                        }">
                         {{ prediction.predictedHomeGoals }}-{{ prediction.predictedAwayGoals }}
                     </strong>
-                    }
-                    @else {
-                    <strong [class]="predictionResultClass(match, prediction)">-</strong>
-                    }
                 </div>
                 }
             </div>

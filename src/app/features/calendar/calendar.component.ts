@@ -9,7 +9,7 @@ import {
   signal,
   ViewChildren
 } from '@angular/core';
-import { AsyncPipe, DatePipe } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatchService } from '../../core/services/match.service';
 import { PredictionService } from '../../core/services/prediction.service';
@@ -56,7 +56,7 @@ interface CalendarStats {
 
 @Component({
   standalone: true,
-  imports: [AsyncPipe, DatePipe, FormsModule, TeamFlagPipe],
+  imports: [AsyncPipe, DatePipe, FormsModule, TeamFlagPipe, NgClass],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.scss'
 })

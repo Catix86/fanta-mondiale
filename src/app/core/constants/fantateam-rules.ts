@@ -89,7 +89,7 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         category: 'pop',
         points: 5,
         label: 'Il Legno',
-        description: 'La squadra colpisce almeno un palo o una traversa.'
+        description: 'La squadra colpisce un palo o una traversa.'
     },
     {
         id: 'freekick',
@@ -124,13 +124,27 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         category: 'knockout',
         points: 10,
         label: 'Passaggio del turno',
-        description: 'La squadra si qualifica agli ottavi/quarti/semifinali.'
+        description: 'La squadra si qualifica a ottavi/quarti/semifinali.'
     },
     {
-        id: 'cuore-freddo',
+        id: 'leader',
         category: 'knockout',
         points: 15,
-        label: 'Cuore freddo',
+        label: 'Leader',
+        description: 'La squadra passa i gironi come prima'
+    },
+    {
+        id: 'passaggio-gironi',
+        category: 'knockout',
+        points: 10,
+        label: 'Girone di ferro',
+        description: 'La squadra si qualifica ai sedicesimi'
+    },
+    {
+        id: 'sangue-freddo',
+        category: 'knockout',
+        points: 15,
+        label: 'Sangue freddo',
         description: 'La squadra vince la partita alla lotteria dei calci di rigore.'
     },
     {
@@ -202,6 +216,20 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         points: -5,
         label: 'Illusione VAR',
         description: 'La squadra esulta per un gol che viene poi annullato dal VAR dopo un controllo.'
+    },
+    {
+        id: 'disfatta',
+        category: 'malus',
+        points: -10,
+        label: 'Disfatta',
+        description: 'La squadra perde la partita alla lotteria dei calci di rigore.'
+    },
+    {
+        id: 'delusione',
+        category: 'malus',
+        points: -5,
+        label: 'Delusione',
+        description: 'La squadra non supera i gironi.'
     }
 ];
 
