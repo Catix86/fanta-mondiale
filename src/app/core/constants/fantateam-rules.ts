@@ -120,6 +120,20 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'I giocatori ballano insieme dopo aver segnato un gol.'
     },
     {
+        id: 'doppietta',
+        category: 'pop',
+        points: 20,
+        label: 'Doppietta',
+        description: 'Un giocato della squadra fa una doppietta.'
+    },
+    {
+        id: 'hat-trick',
+        category: 'pop',
+        points: 30,
+        label: 'Hat Trick',
+        description: 'Un giocato della squadra fa una tripletta.'
+    },
+    {
         id: 'passaggio-turno',
         category: 'knockout',
         points: 10,
