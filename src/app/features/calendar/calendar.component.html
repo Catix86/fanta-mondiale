@@ -26,7 +26,11 @@
                 <strong>{{ match.homeTeam }}</strong>
             </div>
 
+            @if(match.status === 'finished') {
+            <span class="muted"><strong>{{ match.officialHomeGoals }} - {{ match.officialAwayGoals }}</strong></span>
+            } @else {
             <span class="muted">vs</span>
+            }
             <div class="team-name-with-flag">
                 <img class="team-flag" [src]="match.awayTeam | teamFlag" [alt]="match.awayTeam" loading="lazy">
                 <strong>{{ match.awayTeam }}</strong>
@@ -38,20 +42,6 @@
             <span>X = {{ outcomePoints(match).drawPoints }} pt</span>
             <span>2 = {{ outcomePoints(match).awayWinPoints }} pt</span>
         </div>
-
-        <div class="potential-points-card">
-            <div>
-                <span>Risultato esatto</span>
-                <strong>
-                    +{{ potentialPredictionPoints(match).exactTotal }} pt
-                </strong>
-            </div>
-        </div>
-
-        @if(match.status === 'finished') {
-        <p class="official-result">Risultato ufficiale:
-            <strong>{{ match.officialHomeGoals }}-{{ match.officialAwayGoals }}</strong></p>
-        }
 
         @if(!locked(match)) {
         <div class="score-inputs">
@@ -71,9 +61,8 @@
             Salva pronostico
             }
         </button>
-        } @else if(match.status !== 'finished') {
-        <p class="locked-message">Pronostico bloccato</p>
         }
+
         <!-- PRONOSTICI -->
         <details class="other-predictions-box">
             <summary>
@@ -93,16 +82,27 @@
 
                 @for(prediction of matchPredictions(match.id); track prediction.uid) {
                 <div class="prediction-row">
-                    <span [ngClass]="{
-                        'my-prediction': (user$ | async)?.username === prediction.username
-                        }">{{ prediction.username }}</span>
+                    <span [ngClass]="{'my-prediction': (user$ | async)?.username === prediction.username}">
+                        {{ prediction.username }}
+                    </span>
 
-                    <strong [class]="predictionResultClass(match, prediction)" [ngClass]="{
-                        'my-prediction': (user$ | async)?.username === prediction.username
-                        }">
-                        {{ prediction.predictedHomeGoals }}-{{ prediction.predictedAwayGoals }}
-                    </strong>
+                    <div class="prediction-values">
+                        <strong [class]="predictionResultClass(match, prediction)"
+                            [ngClass]="{'my-prediction': (user$ | async)?.username === prediction.username}">
+                            @if(match.status === 'finished') {
+                            +{{ predictionPoints(match, prediction) }} pt
+                            } @else {
+                            +{{ potentialPredictionPoints(match, prediction).exactTotal }} pt
+                            }
+                        </strong>
+
+                        <strong [class]="predictionResultClass(match, prediction)"
+                            [ngClass]="{'my-prediction': (user$ | async)?.username === prediction.username}">
+                            {{ prediction.predictedHomeGoals }}-{{ prediction.predictedAwayGoals }}
+                        </strong>
+                    </div>
                 </div>
+
                 }
             </div>
         </details>

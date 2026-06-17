@@ -29,7 +29,10 @@ import {
   getMatchOutcomePoints,
   MatchOutcomePoints,
   calculatePotentialPredictionPoints,
-  PotentialPredictionPoints
+  PotentialPredictionPoints,
+  getOutcomePointsForPrediction,
+  getExactResultBonus,
+  getOutcome
 } from '../../core/utils/dynamic-scoring';
 import { TeamFlagPipe } from '../../shared/pipes/team-flag.pipe';
 import { ToastService } from '../../core/services/toast.service';
@@ -174,13 +177,11 @@ export class CalendarComponent implements AfterViewInit {
     return getMatchOutcomePoints(match);
   }
 
-  potentialPredictionPoints(match: Match): PotentialPredictionPoints {
-    const draft = this.draft(match.id);
-
+  potentialPredictionPoints(match: Match, prediction: MatchPredictionView): PotentialPredictionPoints {
     return calculatePotentialPredictionPoints(
       match,
-      Number(draft.home),
-      Number(draft.away)
+      Number(prediction.predictedHomeGoals),
+      Number(prediction.predictedAwayGoals)
     );
   }
 
@@ -409,5 +410,48 @@ export class CalendarComponent implements AfterViewInit {
     }
 
     return 'prediction-wrong';
+  }
+
+  predictionPoints(
+    match: Match,
+    prediction: MatchPredictionView
+  ): number {
+    if (
+      match.status !== 'finished' ||
+      typeof match.officialHomeGoals !== 'number' ||
+      typeof match.officialAwayGoals !== 'number'
+    ) {
+      return 0;
+    }
+
+    const predictedOutcome = getOutcome(
+      prediction.predictedHomeGoals,
+      prediction.predictedAwayGoals
+    );
+
+    const officialOutcome = getOutcome(
+      match.officialHomeGoals,
+      match.officialAwayGoals
+    );
+
+    if (predictedOutcome !== officialOutcome) {
+      return 0;
+    }
+
+    const outcomePoints = getOutcomePointsForPrediction(
+      match,
+      prediction.predictedHomeGoals,
+      prediction.predictedAwayGoals
+    );
+
+    const exactResult =
+      prediction.predictedHomeGoals === match.officialHomeGoals &&
+      prediction.predictedAwayGoals === match.officialAwayGoals;
+
+    if (!exactResult) {
+      return outcomePoints;
+    }
+
+    return outcomePoints + getExactResultBonus(outcomePoints);
   }
 }

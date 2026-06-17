@@ -132,7 +132,15 @@ h2 {
     margin: 12px 0 0;
 }
 
-.team-event-row,
+.team-event-row {
+    display: flex;
+    align-items: center; // ✅ allineamento verticale
+    justify-content: space-between; // ✅ spinge lo span a destra
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    padding: 10px 0;
+}
+
 .rule-row {
     display: flex;
     gap: 10px;
@@ -150,7 +158,7 @@ h2 {
 
 .team-event-row span,
 .rule-row span {
-    min-width: 42px;
+    min-width: 50px;
     padding: 5px 8px;
     border-radius: 999px;
     text-align: center;

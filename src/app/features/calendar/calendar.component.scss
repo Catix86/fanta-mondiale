@@ -114,6 +114,11 @@ h1 {
     text-align: center;
     align-items: center;
     margin: 14px 0;
+
+    span>strong {
+        font-size: 40px;
+        color: var(--accent);
+    }
 }
 
 .official-result {
@@ -205,13 +210,26 @@ h1 {
     font-size: 12px;
 }
 
+
 .prediction-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 8px 0;
-    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.prediction-values {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.prediction-values strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: right;
 }
 
 .prediction-row span {
