@@ -141,6 +141,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'La squadra segna 10 o più goal nei gironi'
     },
     {
+        id: 'corazzata',
+        category: 'knockout',
+        points: 10,
+        label: 'Corazzata',
+        description: 'La squadra non sobisce nemmeno un goal nei gironi'
+    },
+    {
         id: 'passaggio-turno',
         category: 'knockout',
         points: 10,
@@ -259,6 +266,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         points: -15,
         label: 'Smircio',
         description: 'La squadra non riesce a segnare neanche un goal nei gironi.'
+    },
+    {
+        id: 'groviera',
+        category: 'knockout',
+        points: -15,
+        label: 'Groviera',
+        description: 'La squadra subisce 10 o più goal nei gironi.'
     },
     {
         id: 'disfatta',
