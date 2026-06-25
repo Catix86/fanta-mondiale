@@ -261,10 +261,10 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'La squadra non supera i gironi.'
     },
     {
-        id: 'delusione',
+        id: 'vergogna',
         category: 'knockout',
-        points: -15,
-        label: 'Delusione',
+        points: -20,
+        label: 'Vergogna',
         description: 'La squadra non supera i gironi a 0 punti.'
     }
     //#endregion
