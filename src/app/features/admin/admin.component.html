@@ -125,9 +125,28 @@
           <label class="muted">Bonus</label>
 
           <div class="rules-picker">
-            @for(rule of rules.filter(r => r.points > 0); track rule.id) {
-            <button type="button" class="rule-choice" [class.selected]="isRuleSelected(rule.id)"
-              (click)="toggleRule(rule.id)">
+            @for(rule of rules.filter(r => r.points > 0 && r.category !== 'knockout'); track rule.id) {
+            <button title="{{rule.description}}" type="button" class="rule-choice"
+              [class.selected]="isRuleSelected(rule.id)" (click)="toggleRule(rule.id)">
+              <span class="rule-points" [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
+                {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
+              </span>
+
+              <span class="rule-label">
+                {{ rule.label }}
+              </span>
+            </button>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label class="muted">Bonus: Knockout</label>
+
+          <div class="rules-picker">
+            @for(rule of rules.filter(r => r.points > 0 && r.category === 'knockout'); track rule.id) {
+            <button title="{{rule.description}}" type="button" class="rule-choice"
+              [class.selected]="isRuleSelected(rule.id)" (click)="toggleRule(rule.id)">
               <span class="rule-points" [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
                 {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
               </span>
@@ -144,8 +163,28 @@
           <label class="muted">Malus</label>
 
           <div class="rules-picker">
-            @for(rule of rules.filter(r => r.points < 0); track rule.id) { <button type="button" class="rule-choice"
-              [class.selected]="isRuleSelected(rule.id)" (click)="toggleRule(rule.id)">
+            @for(rule of rules.filter(r => r.points < 0 && r.category !=='knockout' ); track rule.id) { <button
+              title="{{rule.description}}" type="button" class="rule-choice" [class.selected]="isRuleSelected(rule.id)"
+              (click)="toggleRule(rule.id)">
+              <span class="rule-points" [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
+                {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
+              </span>
+
+              <span class="rule-label">
+                {{ rule.label }}
+              </span>
+              </button>
+              }
+          </div>
+        </div>
+
+        <div>
+          <label class="muted">Malus: Knockout</label>
+
+          <div class="rules-picker">
+            @for(rule of rules.filter(r => r.points < 0 && r.category==='knockout' ); track rule.id) { <button
+              title="{{rule.description}}" type="button" class="rule-choice" [class.selected]="isRuleSelected(rule.id)"
+              (click)="toggleRule(rule.id)">
               <span class="rule-points" [class.positive]="rule.points > 0" [class.negative]="rule.points < 0">
                 {{ rule.points > 0 ? '+' : '' }}{{ rule.points }}
               </span>
@@ -179,11 +218,6 @@
     </summary>
 
     <div class="accordion-content">
-      <!-- <p class="muted">
-        Inserisci il risultato ufficiale. Quando salvi, la partita passa allo stato
-        <strong>finished</strong>.
-      </p> -->
-
       @if(matches$ | async; as matches) {
 
       <!-- NO MATCHES -->
@@ -200,14 +234,6 @@
                 }">
         <div class="match-admin-topline">
           <strong>{{ match.homeTeam }} - {{ match.awayTeam }}</strong>
-
-          <!-- <span class="status-badge" [ngClass]="{
-                  'status-scheduled': match.status === 'scheduled',
-                  'status-live': match.status === 'live',
-                  'status-finished': match.status === 'finished'
-                }">
-            {{ statusLabel(match.status) }}
-          </span> -->
           <span class="muted">
             {{ matchDate(match) | date:'dd MMM HH:mm' }}
           </span>

@@ -141,6 +141,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'La squadra si qualifica a ottavi/quarti/semifinali.'
     },
     {
+        id: 'passaggio-gironi',
+        category: 'knockout',
+        points: 10,
+        label: 'Girone di ferro',
+        description: 'La squadra si qualifica ai sedicesimi'
+    },
+    {
         id: 'leader',
         category: 'knockout',
         points: 15,
@@ -148,11 +155,11 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'La squadra passa i gironi come prima'
     },
     {
-        id: 'passaggio-gironi',
+        id: 'leader-full',
         category: 'knockout',
-        points: 10,
-        label: 'Girone di ferro',
-        description: 'La squadra si qualifica ai sedicesimi'
+        points: 20,
+        label: 'Prima della classe',
+        description: 'La squadra passa i gironi come prima a punteggio pieno'
     },
     {
         id: 'sangue-freddo',
@@ -162,12 +169,20 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'La squadra vince la partita alla lotteria dei calci di rigore.'
     },
     {
+        id: 'goleador',
+        category: 'knockout',
+        points: 15,
+        label: 'Goleador',
+        description: 'La squadra ha il capocannoniere del torneo'
+    },
+    {
         id: 'campione-mondo',
         category: 'knockout',
         points: 100,
         label: 'Campione del Mondo',
         description: 'La squadra alza la coppa.'
     },
+    //#region MALUS
     {
         id: 'sconfitta',
         category: 'malus',
@@ -233,18 +248,26 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
     },
     {
         id: 'disfatta',
-        category: 'malus',
+        category: 'knockout',
         points: -10,
         label: 'Disfatta',
         description: 'La squadra perde la partita alla lotteria dei calci di rigore.'
     },
     {
         id: 'delusione',
-        category: 'malus',
-        points: -5,
+        category: 'knockout',
+        points: -10,
         label: 'Delusione',
         description: 'La squadra non supera i gironi.'
+    },
+    {
+        id: 'delusione',
+        category: 'knockout',
+        points: -15,
+        label: 'Delusione',
+        description: 'La squadra non supera i gironi a 0 punti.'
     }
+    //#endregion
 ];
 
 export function getFantaTeamRule(ruleId: string): FantaTeamRule | undefined {

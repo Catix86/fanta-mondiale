@@ -65,8 +65,18 @@ export class DashboardComponent implements OnInit {
       this.stats.set([
         {
           icon: 'leaderboard',
-          title: 'Punti',
+          title: 'Punti totali',
           value: stat.points.toString()
+        },
+        {
+          icon: 'leaderboard',
+          title: 'Punti squadra',
+          value: stat.squadPoints.toString()
+        },
+        {
+          icon: 'leaderboard',
+          title: 'Punti predizioni',
+          value: stat.predictionPoints.toString()
         },
         {
           icon: 'sports_soccer',
