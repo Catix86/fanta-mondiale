@@ -136,14 +136,14 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
     {
         id: 'furia',
         category: 'knockout',
-        points: 10,
+        points: 15,
         label: 'Furia',
         description: 'La squadra segna 10 o più goal nei gironi'
     },
     {
         id: 'corazzata',
         category: 'knockout',
-        points: 10,
+        points: 15,
         label: 'Corazzata',
         description: 'La squadra non sobisce nemmeno un goal nei gironi'
     },
@@ -185,7 +185,7 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
     {
         id: 'goleador',
         category: 'knockout',
-        points: 15,
+        points: 50,
         label: 'Goleador',
         description: 'La squadra ha il capocannoniere del torneo'
     },
