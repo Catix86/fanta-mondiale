@@ -134,6 +134,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         description: 'Un giocato della squadra fa una tripletta.'
     },
     {
+        id: 'furia',
+        category: 'knockout',
+        points: 10,
+        label: 'Furia',
+        description: 'La squadra segna 10 o più goal nei gironi'
+    },
+    {
         id: 'passaggio-turno',
         category: 'knockout',
         points: 10,
@@ -245,6 +252,13 @@ export const FANTATEAM_RULES: FantaTeamRule[] = [
         points: -5,
         label: 'Illusione VAR',
         description: 'La squadra esulta per un gol che viene poi annullato dal VAR dopo un controllo.'
+    },
+    {
+        id: 'smircio',
+        category: 'knockout',
+        points: -15,
+        label: 'Smircio',
+        description: 'La squadra non riesce a segnare neanche un goal nei gironi.'
     },
     {
         id: 'disfatta',
