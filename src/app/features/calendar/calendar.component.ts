@@ -129,7 +129,6 @@ export class CalendarComponent implements AfterViewInit {
         this.existingPredictionMatchIds = existing;
       });
 
-
     this.matches$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(matches => {
@@ -453,5 +452,18 @@ export class CalendarComponent implements AfterViewInit {
     }
 
     return outcomePoints + getExactResultBonus(outcomePoints);
+  }
+
+  getLabelStage(stage: string): string {
+    switch (stage) {
+      case 'round32': return 'Sedicesimi'
+      case 'round16': return 'Ottavi'
+      case 'quarter': return 'Quarti'
+      case 'semi': return 'Semifinale'
+      case 'third_place': return 'Finale 3° posto'
+      case 'final': return 'Sedicesimi'
+    }
+
+    return 'Gruppo';
   }
 }

@@ -1,7 +1,7 @@
 import { Timestamp } from '@angular/fire/firestore';
 
 export type MatchStatus = 'scheduled' | 'live' | 'finished';
-export type MatchStage = 'group' | 'round16' | 'quarter' | 'semi' | 'third_place' | 'final';
+export type MatchStage = 'group' | 'round32' | 'round16' | 'quarter' | 'semi' | 'third_place' | 'final';
 
 export interface Match {
   id: string;

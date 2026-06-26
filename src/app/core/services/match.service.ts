@@ -34,14 +34,21 @@ export class MatchService {
 
   async createMatch(payload: CreateMatchPayload): Promise<void> {
     const ref = collection(this.firestore, 'matches');
+
     const matchToCreate: Omit<Match, 'id'> = {
       homeTeam: payload.homeTeam.trim(),
       awayTeam: payload.awayTeam.trim(),
-      group: payload.group?.trim() || undefined,
       stage: payload.stage,
       kickoffAt: Timestamp.fromDate(payload.kickoffAt),
       status: 'scheduled' as MatchStatus
     };
+
+    const group = payload.group?.trim();
+
+    if (group) {
+      matchToCreate.group = group;
+    }
+
     await addDoc(ref, matchToCreate);
   }
 

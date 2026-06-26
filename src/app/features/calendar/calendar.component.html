@@ -16,7 +16,7 @@
     @for(match of matches; track match.id) {
     <section #matchCard class="card match-card" [attr.data-match-id]="match.id">
         <div class="match-topline">
-            <strong>{{ match.group ? 'Gruppo ' + match.group : match.stage }}</strong>
+            <strong>{{ match.group ? 'Gruppo ' + match.group : getLabelStage(match.stage) }}</strong>
             <span class="muted">{{ matchDate(match) | date:'dd MMMM ore HH:mm' }}</span>
         </div>
 

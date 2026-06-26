@@ -54,6 +54,7 @@ export class AdminComponent {
 
   stages: { label: string; value: MatchStage }[] = [
     { label: 'Girone', value: 'group' },
+    { label: 'Sedicesimi', value: 'round32' },
     { label: 'Ottavi', value: 'round16' },
     { label: 'Quarti', value: 'quarter' },
     { label: 'Semifinale', value: 'semi' },
