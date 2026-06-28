@@ -36,24 +36,24 @@
           @if(user.uid !== currentUser.uid && hasSquad(user)) {
           <small class="open-squad-hint">
             Guarda la squadra di {{ cleanUsername(user.username) }}
-            </small>
-            } @else if(!hasSquad(user)) {
-            <small class="open-no-squad-hint">
-              <span class="material-symbols-rounded warning-icon">
-                warning
-              </span>
+          </small>
+          } @else if(!hasSquad(user)) {
+          <small class="open-no-squad-hint">
+            <span class="material-symbols-rounded warning-icon">
+              warning
+            </span>
             <span class="warning-text">
               {{ cleanUsername(user.username) }} non ha ancora creato la squadra
             </span>
-            </small>
-            }
+          </small>
+          }
         </div>
-        </div>
+      </div>
 
-        <strong class="points">
-          {{ user.points }}
-          <span>pt</span>
-        </strong>
+      <strong class="points">
+        {{ user.points }}
+        <span>pt</span>
+      </strong>
     </div>
 
     <details class="leaderboard-score-details" (click)="$event.stopPropagation()">
@@ -94,8 +94,8 @@
         </div>
       </div>
     </details>
-    </section>
-    }
+  </section>
+  }
   }
   }
 
@@ -153,7 +153,7 @@
             </div>
           </div>
 
-          <strong>
+          <strong [class.positive-text]="team.finalPoints > 0" [class.negative-text]="team.finalPoints < 0">
             {{ team.finalPoints }} pt
           </strong>
         </div>

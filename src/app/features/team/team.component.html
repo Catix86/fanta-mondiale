@@ -92,7 +92,9 @@
                 <p class="muted">{{ team.price }} FC</p>
             </div>
 
-            <strong>{{ team.finalPoints }} pt</strong>
+            <strong [class.positive-text]="team.finalPoints > 0" [class.negative-text]="team.finalPoints < 0">
+                {{ team.finalPoints }} pt
+            </strong>
         </div>
 
         @if(team.events.length === 0) {
@@ -130,21 +132,21 @@
             Vedi regole
         </button>
     </section>
-    </main>
+</main>
 
-    @if(rulesModalOpen()) {
-    <div class="rules-modal-backdrop" (click)="closeRulesModal()">
-        <section class="card rules-modal" (click)="$event.stopPropagation()">
-            <div class="rules-modal-header">
-                <div>
-                    <span class="muted">Lista completa</span>
-                    <h2>Bonus/Malus</h2>
-                </div>
-
-                <button type="button" class="rules-modal-close" (click)="closeRulesModal()" aria-label="Chiudi">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
+@if(rulesModalOpen()) {
+<div class="rules-modal-backdrop" (click)="closeRulesModal()">
+    <section class="card rules-modal" (click)="$event.stopPropagation()">
+        <div class="rules-modal-header">
+            <div>
+                <span class="muted">Lista completa</span>
+                <h2>Bonus/Malus</h2>
             </div>
+
+            <button type="button" class="rules-modal-close" (click)="closeRulesModal()" aria-label="Chiudi">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+        </div>
 
         <div class="rules-modal-body">
             @for(rule of rules; track rule.id) {
@@ -157,8 +159,8 @@
                     <strong>{{ rule.label }}</strong>
                     <p>{{ rule.description }}</p>
                 </div>
-                </div>
-                }
+            </div>
+            }
         </div>
     </section>
 </div>
